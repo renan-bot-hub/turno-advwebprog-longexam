@@ -1,0 +1,108 @@
+const products = [
+  {
+    name: 'nu-powerbank-10000mah',
+    title: 'Fast Charge Power Bank',
+    category: 'Daily Essentials',
+    price: 'PHP 1,299',
+    stock: 'In stock',
+    imageUrl: 'https://ecommerce.datablitz.com.ph/cdn/shop/files/dfbfdb_1dfa5b1d-0153-4b2c-b91d-f6dba679d87f_1024x.jpg?v=1703065790',
+    content: [
+      'A lifesaver for long days on campus when you cannot find a wall outlet.',
+      'Features a sleek navy blue aluminum casing with the NU logo, carrying enough juice to charge your phone up to 4 times.',
+      'Includes dual USB-C ports so you can charge your phone and a friend\'s device at the same time between classes.',
+    ],
+  },
+  {
+    name: 'nu-insulated-flask',
+    title: 'Water Flask', 
+    category: 'Daily Essentials',
+    price: 'PHP 750',
+    stock: 'In stock',
+    imageUrl: 'https://hydroflask.ph/cdn/shop/files/2100313069_1_1024x1024.jpg?v=1761293661',
+    content: [
+      'An 18/8 food-grade stainless steel flask engineered for durability during intense training and long lecture days.',
+      'Features a double-walled vacuum seal that maintains your water at a crisp, ice-cold temperature for up to 24 hours.',
+      'Equipped with a sweat-proof exterior and a leak-proof sports cap, ensuring your notes and gym bag stay perfectly dry.',
+    ],
+  },
+  {
+    name: 'nu-varsity-cap',
+    title: 'Embroidered NU Cap',
+    category: 'Campus Apparel',
+    price: 'PHP 450',
+    stock: 'Low stock',
+    imageUrl: 'https://chrissports.com/cdn/shop/files/NU1_1_800x.jpg',
+    content: [
+      'Represent the university wherever you go with this premium adjustable cotton twill cap.',
+      'Features the established NU Bulldog emblem stitched firmly on the front panel in academic gold.',
+      'Built with a reinforced brim to withstand heavy use during the sunny commute season.',
+    ],
+  },
+  {
+    name: 'nu-gan-charger',
+    title: '65W Multi-Port Fast Charger',
+    category: 'Study Supplies',
+    price: 'PHP 950',
+    stock: 'In stock',
+    imageUrl: 'https://anker.ph/cdn/shop/files/B2697J41_800x.png',
+    content: [
+      'The ultimate library hack. When outlets are scarce, this single charging block is all you need.',
+      'Equipped with 2 USB-C and 1 USB-A port to charge your laptop, tablet, and phone simultaneously from one wall plug.',
+      'Uses GaN technology to remain ultra-compact and prevent overheating in your backpack.',
+    ],
+  },
+  {
+    name: 'nu-official-lanyard',
+    title: 'Official Bulldog Lanyard',
+    category: 'Daily Essentials',
+    price: 'PHP 150',
+    stock: 'In stock',
+    imageUrl: 'https://varsitylifestyleco.com/cdn/shop/files/NULanyard.jpg',
+    content: [
+      'Keep your campus ID secure and accessible with the official Bulldog Lanyard.',
+      'Made from durable, comfortable polyester webbing with a heavy-duty metal clasp.',
+      'Ensures your keys and student ID stay put during your daily commute and campus entry.',
+    ],
+  },
+  {
+    name: 'nu-classic-sweatshirt',
+    title: 'Classic NU Sweatshirt',
+    category: 'Campus Apparel',
+    price: 'PHP 1,150',
+    stock: 'In stock',
+    imageUrl: 'https://varsitylifestyleco.com/cdn/shop/files/NU_1_3f436c59-5a59-464c-a0f1-16aee5b27f00.jpg',
+    content: [
+      'A classic gray collegiate sweatshirt perfect for early morning classes.',
+      'Crafted from a soft cotton blend to keep you warm and comfortable.',
+      'An essential layer for heavily air-conditioned lecture halls and study sessions.',
+    ],
+  },
+  {
+    name: 'nu-heavyweight-hoodie',
+    title: 'NU Heavyweight Hoodie',
+    category: 'Campus Apparel',
+    price: 'PHP 1,250',
+    stock: 'In stock',
+    imageUrl: 'https://varsitylifestyleco.com/cdn/shop/files/NU1_c809a5da-e148-4e16-95ce-8084f3150cca.jpg',
+    content: [
+      'Represent the gold and blue with this premium heavy-weight navy hoodie featuring the iconic Bulldog mascot.',
+      'Designed with a soft-brushed interior to keep you comfortable during long study sessions in chilled university hallways.',
+      'Features a spacious front kangaroo pocket and high-quality screen printing for a classic, durable campus look.',
+    ],
+  },
+  {
+    name: 'nu-heritage-shirt',
+    title: 'NU Heritage Cotton Shirt',
+    category: 'Campus Apparel',
+    price: 'PHP 499',
+    stock: 'In stock',
+    imageUrl: 'https://ph-live-01.slatic.net/p/mdc/dc6f40dc1118bce32be03e63248b19e2.jpg',
+    content: [
+      'A classic navy blue tee featuring the vintage National University gold screen-print.',
+      'Crafted from 100% breathable high-grade cotton to keep you cool during hot campus walks and active days.',
+      'Reinforced stitching and a comfortable fit make this the perfect daily driver for representing the NU pride.',
+    ],
+  },
+];
+
+export default products;

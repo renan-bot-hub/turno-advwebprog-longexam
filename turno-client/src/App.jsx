@@ -50,7 +50,7 @@ const routes = [
       {
         path: "signup",
         element: <SignUpPage />,
-      }
+      },
     ],
   },
 ];

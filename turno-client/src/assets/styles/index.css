@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@layer base {
+  body {   
+    @apply bg-slate-50 text-blue-900 antialiased;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+}
+```</Link>
