@@ -1,4 +1,4 @@
-# BulldogEx
+# BulldogEx Shop
 
 BulldogEx is a campus e-commerce web application for selling official and campus-inspired products. The project includes a React frontend, an Express REST API, and MongoDB data storage for products, users, orders, carts, and reviews.
 
