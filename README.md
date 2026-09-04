@@ -28,6 +28,7 @@ Admins can also:
 - Backend: Express.js
 - Database: MongoDB with Mongoose
 - Auth: JWT and bcryptjs
+- API Testing: Postman
 - Environment config: dotenv
 
 ## Project Structure
