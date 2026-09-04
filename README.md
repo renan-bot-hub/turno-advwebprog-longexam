@@ -1,207 +1,188 @@
-# CTWEBPGL Web Programming - Long Exam 1
+# BulldogEx
 
-This repository contains a React frontend built with Vite, React Router, and Tailwind CSS, plus an Express.js and MongoDB REST API.
+BulldogEx is a campus e-commerce web application for selling official and campus-inspired products. The project includes a React frontend, an Express REST API, and MongoDB data storage for products, users, orders, carts, and reviews.
 
-The current project is **BulldogEx Shop**, a low-fidelity e-commerce wireframe for campus products. It includes a full-width hero banner, product catalog cards, product detail pages, store information pages, shared layouts, and authentication screens.
+## Project Overview
+
+This system simulates a campus store where customers can:
+
+- browse products by category
+- view product details
+- add items to cart
+- register and sign in
+- place orders
+- view order history and profile information
+
+Admins can also:
+
+- manage products
+- manage users
+- manage orders
+- review and moderate store activity
 
 ## Tech Stack
 
-- React 19
-- Vite
-- React Router DOM
-- Tailwind CSS 4
-- ESLint
-- Express.js
-- MongoDB with Mongoose
+- Frontend: React 19 + Vite
+- Routing: React Router DOM
+- UI: custom CSS and responsive layout
+- Backend: Express.js
+- Database: MongoDB with Mongoose
+- Auth: JWT and bcryptjs
+- Environment config: dotenv
 
-## Main Features
-
-- Full-width e-commerce hero section with background image overlay
-- Product listing page with reusable product cards
-- Product detail page with price, category, stock, description, and action buttons
-- Store-focused home, about, footer, and not found pages
-- Authentication pages for sign in and sign up
-- Shared layout, navbar, footer, and button components
-
-## Fork and Clone Instructions
-
-Fork the original repository first on GitHub. This creates your own copy of the repository under your GitHub account.
-
-After the repository is forked, clone your forked repository to your local device:
-
-1. Go to the root folder where you want to save the project.
-2. Open that folder in **VS Code**.
-3. Open the **VS Code Terminal**.
-4. Run `git clone` using the URL of your forked repository:
-
-```bash
-git clone <forked-repository-url>
-```
-
-Example:
-
-```bash
-git clone https://github.com/your-username/surname-long-exam.git
-```
-
-After cloning the forked repository, go inside the cloned project folder:
-
-```bash
-cd surname-long-exam
-```
-
-## Project Setup
-
-Install and run the API:
-
-```bash
-cd turno-server
-npm install
-copy .env.example .env
-npm run dev
-```
-
-See [turno-server/README.md](turno-server/README.md) for the REST endpoint reference and query parameters.
-
-Install dependencies inside the client app:
-
-```bash
-cd surname-client
-npm install
-```
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-Run linting:
-
-```bash
-npm run lint
-```
-
-## Push to GitHub Using Git Bash
-
-Open **Git Bash** or **VS Code Terminal**, then go to the project root folder:
-
-Example
-```bash
-cd /c/Users/ACER/Desktop/cy.dev/cy.dev.reactjs/course-material/webprog/long-exam1
-```
-
-Check the files before committing:
-
-```bash
-git status
-```
-
-If this folder is not yet a Git repository, initialize it:
-
-```bash
-git init
-```
-
-Stage, commit, and push the project:
-
-```bash
-git add .
-git commit -m "initial long-exam1"
-git push origin main
-```
-
-For future updates after editing files:
-
-```bash
-git status
-git add .
-git commit -m "enhanced long-exam1"
-git push
-```
-
-## Current Routes
-
-- `/` - Home page
-- `/about` - About page
-- `/products` - Product list page
-- `/products/:name` - Single product page
-- `/auth/signin` - Sign in page
-- `/auth/signup` - Sign up page
-
-## Key Files
-
-- `src/assets/product-content.js` - product data used by the catalog and product pages
-- `src/components/ProductCard.jsx` - reusable product card component
-- `src/components/ProductList.jsx` - product grid component
-- `src/pages/LandingPages/ProductListPage.jsx` - product catalog page
-- `src/pages/LandingPages/ProductPage.jsx` - single product detail page
-- `src/pages/LandingPages/HomePage.jsx` - landing page with full-width hero banner
-
-## Current File Structure
+## Project Structure
 
 ```text
-long-exam1/
+turno-webprog-longexam/
 ├── README.md
-└── robles-client/
-    ├── .gitignore
-    ├── eslint.config.js
-    ├── index.html
-    ├── package-lock.json
+├── turno-client/
+│   ├── package.json
+│   ├── src/
+│   │   ├── api/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── layouts/
+│   │   ├── pages/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   └── vite.config.js
+└── turno-server/
     ├── package.json
-    ├── public/
-    │   ├── favicon.svg
-    │   └── icons.svg
-    ├── vite.config.js
+    ├── seed.js
+    ├── README.md
     └── src/
-        ├── App.jsx
-        ├── main.jsx
-        ├── assets/
-        │   ├── hero.png
-        │   ├── product-content.js
-        │   ├── react.svg
-        │   ├── vite.svg
-        │   ├── img/
-        │   │   ├── nu_bulldogex_banner.jpg
-        │   │   └── nubdexchange_logo.png
-        │   └── styles/
-        │       └── index.css
-        ├── components/
-        │   ├── Button.jsx
-        │   ├── Footer.jsx
-        │   ├── NavBar.jsx
-        │   ├── ProductCard.jsx
-        │   └── ProductList.jsx
-        ├── layouts/
-        │   ├── AuthLayout.jsx
-        │   └── Layout.jsx
-        └── pages/
-            ├── NotFoundPage.jsx
-            ├── AuthPages/
-            │   ├── SignInPage.jsx
-            │   └── SignUpPage.jsx
-            └── LandingPages/
-                ├── AboutPage.jsx
-                ├── ProductListPage.jsx
-                ├── ProductPage.jsx
-                └── HomePage.jsx
+        ├── app.js
+        ├── server.js
+        ├── config/
+        ├── middleware/
+        ├── models/
+        └── routes/
 ```
+
+## Features
+
+- responsive landing page with hero banner and product highlights
+- product catalog with category and search support
+- detailed product page with pricing, stock, and description
+- cart and order workflow
+- user authentication and protected routes
+- admin dashboard access for store management
+- seeded sample data for products, users, orders, carts, and reviews
+
+## Local Setup
+
+### 1) Install dependencies
+
+Frontend:
+
+```bash
+cd turno-webprog-longexam/turno-client
+npm install
+```
+
+Backend:
+
+```bash
+cd turno-webprog-longexam/turno-server
+npm install
+```
+
+### 2) Configure environment
+
+Create a `.env` file inside the server folder based on the example:
+
+```bash
+cd turno-webprog-longexam/turno-server
+copy .env.example .env
+```
+
+Then verify your MongoDB URI:
+
+```env
+MONGODB_URI=mongodb://127.0.0.1:27017/bulldogs_exchange
+PORT=5000
+JWT_SECRET=your_secret_key_here
+```
+
+### 3) Start the app
+
+Backend:
+
+```bash
+cd turno-webprog-longexam/turno-server
+npm run dev
+```
+
+Frontend:
+
+```bash
+cd turno-webprog-longexam/turno-client
+npm run dev -- --host 0.0.0.0
+```
+
+Then open:
+
+- frontend: http://localhost:5173
+- backend health check: http://localhost:5000/api/health
+
+## Seed Data and Login Accounts
+
+The backend includes seeded demo users. These are the default login credentials for the system:
+
+- Admin: `admin@nu.edu.ph` / `hashed_admin_password`
+- Customer: `juan.delacruz@nu.edu.ph` / `hashed_password_1`
+- Customer: `maria.santos@nu.edu.ph` / `hashed_password_2`
+
+To reseed the database:
+
+```bash
+cd turno-webprog-longexam/turno-server
+npm run seed
+```
+
+## Main Routes
+
+### Public
+
+- `/` - home page
+- `/about` - about page
+- `/products` - product catalog
+- `/products/:id` - product detail page
+- `/auth/signin` - sign in
+- `/auth/signup` - sign up
+
+### Customer
+
+- `/cart` - cart
+- `/orders` - order history
+- `/profile` - profile page
+
+### Admin
+
+- `/admin/products` - manage products
+- `/admin/orders` - manage orders
+- `/admin/users` - manage users
+- `/admin/reviews` - manage reviews
+
+## API Overview
+
+The server exposes REST endpoints for the store, including product and auth routes. See [turno-server/README.md](turno-server/README.md) for the detailed API documentation.
 
 ## Notes
 
-- `node_modules/` and `dist/` are not included in the structure above because they are generated folders.
-- The application uses `Layout.jsx` for public pages and `AuthLayout.jsx` for authentication pages.
-- Product routes use the product `name` value from `product-content.js` as the URL slug.
+- The project is structured as a split frontend/backend application.
+- The frontend uses local storage for auth session behavior and route guarding.
+- Product and user data are seeded for testing and demonstration.
 
-## Enhancement Instructions
-- Enhancement 1: Develop an original product catalog with appropriate product names, descriptions, prices, categories, and images.
-- Enhancement 2: Create a customized footer and notfoundpage that aligns with the website theme and ensure that all links function correctly.
-- Enhancement 3: Provide accessible navigation links for both Sign In and Sign Up pages.
-- Enhancement 4: Improve the overall visual design through consistent colors, typography, spacing, and imagery without changing the existing component order or page structure.
-- Enhancement 5: Research and apply a custom font to the web application using an appropriate implementation method.
+## Build and Linting
+
+Frontend:
+
+```bash
+cd turno-webprog-longexam/turno-client
+npm run build
+npm run lint
+```
+
+Backend is started with nodemon during development and runs through Node in production.

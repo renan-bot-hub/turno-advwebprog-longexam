@@ -1,6 +1,16 @@
 # Bulldogs Exchange API
 
-REST API for the Bulldogs Exchange product catalog using Express.js and MongoDB.
+Bulldogs Exchange is the backend service for the campus e-commerce application. It exposes REST endpoints for products, authentication, users, carts, orders, and reviews using Express.js and MongoDB.
+
+## Tech Stack
+
+- Node.js
+- Express.js
+- MongoDB with Mongoose
+- JWT authentication
+- bcryptjs password hashing
+- dotenv environment configuration
+- nodemon for development
 
 ## Setup
 
@@ -11,21 +21,208 @@ copy .env.example .env
 npm run dev
 ```
 
-Seed the catalog after MongoDB is available:
+Create an environment file with your MongoDB connection and app settings:
+
+```env
+MONGODB_URI=mongodb://127.0.0.1:27017/bulldogs_exchange
+PORT=5000
+JWT_SECRET=your_secret_key_here
+```
+
+Seed the database after MongoDB is available:
 
 ```bash
 npm run seed
 ```
 
-Set `MONGODB_URI` in `.env` to a local MongoDB instance or MongoDB Atlas connection string.
+## Seeded Accounts
 
-## Endpoints
+The app includes demo users for testing:
 
-- `GET /api/health`
-- `GET /api/products?page=1&limit=10&category=Campus%20Apparel&search=hoodie&minPrice=500&maxPrice=2000&sort=price&order=asc`
-- `GET /api/products/:id`
-- `POST /api/products`
-- `PUT /api/products/:id`
-- `DELETE /api/products/:id`
+- Admin: `admin@nu.edu.ph` / `hashed_admin_password`
+- Customer: `juan.delacruz@nu.edu.ph` / `hashed_password_1`
+- Customer: `maria.santos@nu.edu.ph` / `hashed_password_2`
 
-Product JSON fields: `name`, `title`, `category`, `price`, `stock`, `description` (array), and `imageUrl`.
+## Authentication Endpoints
+
+### Register
+
+```http
+POST /api/auth/register
+```
+
+Request body:
+
+```json
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "jane@example.com",
+  "password": "123456"
+}
+```
+
+### Login
+
+```http
+POST /api/auth/login
+```
+
+Request body:
+
+```json
+{
+  "email": "admin@nu.edu.ph",
+  "password": "hashed_admin_password"
+}
+```
+
+### Get Current User
+
+```http
+GET /api/auth/me
+```
+
+### Update Profile
+
+```http
+PUT /api/auth/me
+```
+
+### Change Password
+
+```http
+PUT /api/auth/me/password
+```
+
+## Product Endpoints
+
+### Get all products
+
+```http
+GET /api/products
+```
+
+Query parameters:
+
+- `page`
+- `limit`
+- `category`
+- `search`
+- `minPrice`
+- `maxPrice`
+- `sort`
+- `order`
+
+Example:
+
+```http
+GET /api/products?page=1&limit=10&category=Campus%20Apparel&search=hoodie&minPrice=500&maxPrice=2000&sort=price&order=asc
+```
+
+### Get product by ID
+
+```http
+GET /api/products/:id
+```
+
+### Create product
+
+```http
+POST /api/products
+```
+
+Admin only.
+
+### Update product
+
+```http
+PUT /api/products/:id
+```
+
+Admin only.
+
+### Delete product
+
+```http
+DELETE /api/products/:id
+```
+
+Admin only.
+
+## User Endpoints
+
+### Get all users
+
+```http
+GET /api/user
+```
+
+Admin only.
+
+### Get user by ID
+
+```http
+GET /api/user/:id
+```
+
+Admin only.
+
+### Create user
+
+```http
+POST /api/user
+```
+
+Admin only.
+
+### Update user
+
+```http
+PUT /api/user/:id
+```
+
+Admin only.
+
+## Cart Endpoints
+
+- `GET /api/cart`
+- `POST /api/cart`
+- `PUT /api/cart/:id`
+- `DELETE /api/cart/:id`
+
+## Order Endpoints
+
+- `GET /api/order`
+- `POST /api/order`
+- `PUT /api/order/:id`
+- `DELETE /api/order/:id`
+
+## Review Endpoints
+
+- `GET /api/review`
+- `POST /api/review`
+- `PUT /api/review/:id`
+- `DELETE /api/review/:id`
+
+## Health Check
+
+```http
+GET /api/health
+```
+
+Example response:
+
+```json
+{
+  "status": "ok",
+  "database": "connected"
+}
+```
+
+## Notes
+
+- Product data includes fields such as `name`, `title`, `category`, `price`, `stock`, `description`, and `imageUrl`.
+- Passwords are hashed with `bcryptjs` before saving.
+- JWT tokens are used to protect authenticated routes.
+- Admin-only routes require the user role to be `admin`.
