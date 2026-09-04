@@ -5,8 +5,8 @@ const ProductList = ({ products }) => {
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 font-['Outfit']">
       {products.map((product) => (
         <Link
-          key={product.name}
-          to={`/products/${product.name}`}
+          key={product._id}
+          to={`/products/${product._id}`}
           className="group relative flex flex-col justify-between rounded-3xl border-2 border-blue-900 bg-white p-5 transition-all duration-300 hover:-translate-y-2 hover:border-yellow-400 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-400 focus-visible:ring-offset-2 active:scale-95"
         >
           <div>

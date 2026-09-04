@@ -4,9 +4,9 @@
 
   const Layout = () => {
     return (
-      <div className="min-h-screen bg-zinc-100 text-zinc-900">
+      <div className="min-h-screen bg-[#0A192F] text-white">
         <NavBar />
-        <main className="pb-16 pt-20">
+        <main className="pb-16">
           <Outlet />
         </main>
         <Footer/>

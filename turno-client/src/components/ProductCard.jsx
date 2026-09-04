@@ -1,6 +1,6 @@
 import Button from './Button';
 
-const ProductCard = ({ product, index }) => {
+const ProductCard = ({ product }) => {
   return (
     <article className="flex flex-col h-full rounded-3xl border-2 border-blue-900 bg-white p-4 transition-all duration-300 hover:-translate-y-1 hover:border-yellow-400 hover:shadow-xl font-['Outfit']">
       
@@ -12,7 +12,7 @@ const ProductCard = ({ product, index }) => {
         />
         {!product.imageUrl && (
             <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold uppercase tracking-widest text-blue-300">
-                Item {String(index + 1).padStart(2, '0')}
+                No Image
             </div>
         )}
       </div>
@@ -29,12 +29,14 @@ const ProductCard = ({ product, index }) => {
         <p className="mt-1 text-base font-black text-blue-900">{product.price}</p>
         
         <p className="mt-3 text-sm leading-relaxed text-slate-600 line-clamp-2">
-          {product.content[0]}
+          {Array.isArray(product.description)
+            ? product.description[0]
+            : product.description ?? ''}
         </p>
         
         <div className="mt-auto pt-4">
             <Button 
-                to={`/products/${product.name}`} 
+                to={`/products/${product._id}`} 
                 className="w-full justify-center border-2 border-blue-900 bg-blue-900 text-yellow-400 hover:bg-yellow-400 hover:text-blue-900 hover:border-yellow-400 transition-colors"
             >
                 View Product

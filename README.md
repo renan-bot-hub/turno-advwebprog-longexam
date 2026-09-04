@@ -1,6 +1,6 @@
 # CTWEBPGL Web Programming - Long Exam 1
 
-This repository contains a React frontend built with Vite, React Router, and Tailwind CSS.
+This repository contains a React frontend built with Vite, React Router, and Tailwind CSS, plus an Express.js and MongoDB REST API.
 
 The current project is **BulldogEx Shop**, a low-fidelity e-commerce wireframe for campus products. It includes a full-width hero banner, product catalog cards, product detail pages, store information pages, shared layouts, and authentication screens.
 
@@ -11,6 +11,8 @@ The current project is **BulldogEx Shop**, a low-fidelity e-commerce wireframe f
 - React Router DOM
 - Tailwind CSS 4
 - ESLint
+- Express.js
+- MongoDB with Mongoose
 
 ## Main Features
 
@@ -49,6 +51,17 @@ cd surname-long-exam
 ```
 
 ## Project Setup
+
+Install and run the API:
+
+```bash
+cd turno-server
+npm install
+copy .env.example .env
+npm run dev
+```
+
+See [turno-server/README.md](turno-server/README.md) for the REST endpoint reference and query parameters.
 
 Install dependencies inside the client app:
 

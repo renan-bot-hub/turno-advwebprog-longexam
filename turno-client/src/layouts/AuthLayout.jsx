@@ -1,50 +1,94 @@
 import { Outlet, Link } from 'react-router-dom';
 import logo from '../assets/img/nubdexchange_logo.png';
+import { Shield, Truck, Star } from 'lucide-react';
+
+const PERKS = [
+  { icon: Shield, text: 'Official NU Store' },
+  { icon: Truck, text: 'Campus Delivery' },
+  { icon: Star, text: 'Quality Guaranteed' },
+];
 
 const AuthLayout = () => {
   return (
-    <section className="min-h-screen bg-slate-50 text-blue-900 font-['Outfit']">
-      <div className="grid min-h-screen w-full lg:grid-cols-[1fr_0.95fr]">
-        
-        <div className="relative flex items-center justify-center overflow-hidden border-b-4 border-yellow-400 bg-blue-900 p-8 sm:p-10 lg:border-b-0 lg:border-r-4 lg:p-16">
-          
-          <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-yellow-400/20 blur-[100px]"></div>
-          <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-blue-500/20 blur-[100px]"></div>
+    <div className="grid min-h-screen h-screen grid-cols-1 overflow-hidden font-['Outfit'] lg:grid-cols-2">
 
-          <div className="relative flex w-full max-w-md flex-col items-center justify-center rounded-[3rem] border-4 border-dashed border-yellow-400/50 bg-blue-800/40 p-10 text-center shadow-2xl backdrop-blur-sm transition-all duration-500 hover:scale-105 hover:border-yellow-400">
-            
-            <div className="mb-6 flex h-32 w-32 items-center justify-center rounded-full border-4 border-yellow-400 bg-white shadow-[0_0_40px_rgba(250,204,21,0.2)]">
-              <img src={logo} alt="BulldogEx Logo" className="h-20 w-20 object-contain" />
+      {/* ── Left Branding Panel (hidden on mobile) ── */}
+      <div className="relative hidden overflow-hidden bg-[#00205B] lg:flex lg:flex-col">
+        {/* Content */}
+        <div className="relative z-10 flex h-full flex-col justify-between p-12 xl:p-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-3 group mb-auto">
+            <div className="relative h-11 w-11">
+              <div className="absolute inset-0 rounded-xl bg-[#F4B41A]/20 blur-sm group-hover:blur-md transition-all" />
+              <img src={logo} alt="BulldogEx" className="relative h-11 w-11 rounded-xl border border-[#F4B41A]/30 object-contain" />
             </div>
-            
-            <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              BulldogEx <span className="text-yellow-400">Shop</span>
+            <div>
+              <p className="text-base font-bold text-white">BulldogEx</p>
+              <p className="text-[9px] font-medium uppercase tracking-widest text-[#F4B41A]/70">Official Campus Shop</p>
+            </div>
+          </Link>
+
+          {/* Headline */}
+          <div className="my-auto max-w-lg py-12">
+            <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-[#F4B41A]">National University</p>
+            <h2 className="text-5xl font-black leading-[1.05] text-white xl:text-6xl">
+              Your Campus.<br />
+              Your <span className="text-[#F4B41A]">Store.</span>
             </h2>
-            <p className="mt-4 text-sm font-medium leading-relaxed text-blue-200">
-              Your central hub for campus uniforms, study essentials, and university merch. Log in to track your orders and fast-track your pickup.
+            <p className="mt-6 max-w-lg text-base leading-relaxed text-white/75">
+              Join thousands of Bulldogs shopping official NU merchandise — from campus apparel to everyday essentials.
             </p>
 
+            {/* Perks */}
+            <div className="mt-9 space-y-4">
+              {PERKS.map(({ icon: Icon, text }) => (
+                <div key={text} className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F4B41A]/15">
+                    <Icon size={15} className="text-[#F4B41A]" />
+                  </div>
+                  <span className="text-base font-medium text-white/80">{text}</span>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* Bottom quote */}
+          <p className="text-[10px] text-blue-300/30 uppercase tracking-widest">
+            © {new Date().getFullYear()} BulldogEx — All rights reserved
+          </p>
+        </div>
+      </div>
+
+      {/* ── Right Form Panel ── */}
+      <div className="relative flex min-h-screen flex-col items-center justify-center bg-[#071428] px-5 py-12 sm:px-8 lg:px-12">
+
+        {/* Mobile background */}
+        {/* Back link */}
+        <div className="absolute left-5 top-5 z-20">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-blue-300/40 transition-colors hover:text-[#F2A900]"
+          >
+            ← Back to Store
+          </Link>
         </div>
 
-        <main className="relative flex items-center bg-white px-6 py-10 sm:px-10 lg:px-16">
-          
-          <div className="absolute left-6 top-8 sm:left-10 lg:left-16">
-            <Link 
-              to="/" 
-              className="inline-flex items-center rounded-md text-xs font-extrabold uppercase tracking-widest text-slate-400 transition-colors hover:text-yellow-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
-            >
-              &larr; Back to Store
-            </Link>
+        {/* Mobile Logo */}
+        <div className="relative z-10 mb-8 flex flex-col items-center lg:hidden">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#F4B41A]/30 bg-white/5 shadow-[0_0_40px_rgba(244,180,26,0.15)] backdrop-blur-sm mb-3">
+            <img src={logo} alt="BulldogEx" className="object-contain h-10 w-10" />
           </div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#F4B41A]/70">Official Bulldogs Shop</p>
+        </div>
 
-          <div className="mx-auto mt-12 w-full max-w-md lg:mt-0">
+        {/* Form Card */}
+        <div className="relative z-10 w-full max-w-md">
+          <div className="rounded-2xl border border-white/10 bg-[#0A192F]/80 px-6 py-8 shadow-2xl shadow-black/40 backdrop-blur-md ring-1 ring-white/5 sm:px-8 sm:py-10">
             <Outlet />
           </div>
-          
-        </main>
+        </div>
       </div>
-    </section>
+    </div>
   );
 };
 
