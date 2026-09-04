@@ -169,6 +169,26 @@ npm run seed
 
 The server exposes REST endpoints for the store, including product and auth routes. See [turno-server/README.md](turno-server/README.md) for the detailed API documentation.
 
+## Postman Collection
+
+A ready-to-use Postman collection is included in the repository:
+
+- [turno-server/Bulldogs-Exchange.postman_collection.json](turno-server/Bulldogs-Exchange.postman_collection.json)
+
+Import this file into Postman to test the system quickly. The collection includes sample requests for:
+
+- health check
+- product listing and filtering
+- product creation and updates
+- auth flow
+- cart, orders, reviews, and admin actions
+
+The base URL is configured as:
+
+```text
+http://localhost:5000/api
+```
+
 ## Notes
 
 - The project is structured as a split frontend/backend application.

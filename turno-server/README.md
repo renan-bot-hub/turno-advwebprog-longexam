@@ -220,6 +220,26 @@ Example response:
 }
 ```
 
+## Postman Collection
+
+A Postman collection is included in this folder:
+
+- `Bulldogs-Exchange.postman_collection.json`
+
+Import it into Postman to test the app endpoints quickly. The collection includes sample requests for:
+
+- health check
+- product listing and filtering
+- create/update/delete products
+- login and registration flow
+- carts, orders, reviews, and user management
+
+Base URL used by the collection:
+
+```text
+http://localhost:5000/api
+```
+
 ## Notes
 
 - Product data includes fields such as `name`, `title`, `category`, `price`, `stock`, `description`, and `imageUrl`.
