@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowRight, ShoppingBag, BookOpen, Laptop,
-  Shirt, Gift, Zap, ChevronRight, Star, TrendingUp,
-  Shield, Truck, RotateCcw, Flame, Clock, Award
+  ArrowRight, ShoppingBag, BookOpen,
+  Shirt, ChevronRight, TrendingUp,
+  Flame, Award
 } from 'lucide-react';
-import { getProducts } from '../../api/products.js';
+import { getProducts, categoryName } from '../../api/products.js';
 import banner from '../../assets/img/nu_bulldogex_banner_clean.jpg';
 
 // ─── Category Chips ────────────────────────────────────────────────────────────
@@ -13,13 +13,6 @@ const CATEGORIES = [
   { label: 'Campus Apparel', icon: Shirt, color: 'bg-blue-500/10 text-blue-300 border-blue-500/20 hover:border-blue-400/60 hover:text-blue-200 hover:bg-blue-500/20' },
   { label: 'Study Supplies', icon: BookOpen, color: 'bg-amber-500/10 text-amber-300 border-amber-500/20 hover:border-amber-400/60 hover:text-amber-200 hover:bg-amber-500/20' },
   { label: 'Daily Essentials', icon: ShoppingBag, color: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20 hover:border-emerald-400/60 hover:text-emerald-200 hover:bg-emerald-500/20' },
-];
-
-// ─── Trust Badges ─────────────────────────────────────────────────────────────
-const TRUST = [
-  { icon: Shield, title: 'Official NU Shop', desc: 'Authentic merchandise backed by National University' },
-  { icon: Truck, title: 'Campus Delivery', desc: 'Fast and reliable delivery within the NU campus' },
-  { icon: RotateCcw, title: 'Quality Guaranteed', desc: 'Every product meets official Bulldogs standards' },
 ];
 
 // ─── Product Card ──────────────────────────────────────────────────────────────
@@ -49,13 +42,13 @@ function ProductCard({ product }) {
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A192F]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         {/* Quick view CTA */}
         <div className="absolute bottom-3 left-0 right-0 flex justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4B41A] px-4 py-1.5 text-[11px] font-bold text-[#0A192F] shadow-lg">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F4B41A] px-4 py-1.5 text-xs font-bold text-[#0A192F] shadow-lg">
             View Product <ArrowRight size={11} />
           </span>
         </div>
         {/* Stock badge */}
         <div className="absolute top-3 right-3">
-          <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider backdrop-blur-sm ${stockStatus.cls}`}>
+          <span className={`rounded-full border px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider backdrop-blur-sm ${stockStatus.cls}`}>
             {stockStatus.label}
           </span>
         </div>
@@ -63,15 +56,10 @@ function ProductCard({ product }) {
 
       {/* Info */}
       <div className="flex flex-col flex-1 p-4">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-[#F4B41A]/70 mb-1">{product.category}</span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-[#F4B41A] mb-1">{categoryName(product)}</span>
         <h3 className="text-sm font-semibold text-white/90 line-clamp-1 mb-auto">{product.title}</h3>
         <div className="mt-3 flex items-center justify-between">
           <p className="text-lg font-black text-[#F4B41A]">₱{product.price?.toLocaleString()}</p>
-          <div className="flex items-center gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={10} className={i < 4 ? 'fill-[#F4B41A] text-[#F4B41A]' : 'text-white/20'} />
-            ))}
-          </div>
         </div>
       </div>
     </Link>
@@ -104,7 +92,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0A192F] font-['Outfit']">
+    <div className="min-h-screen bg-[#0A192F]">
 
       {/* ── Hero ── */}
       <section className="relative aspect-[1709/651] w-full overflow-hidden bg-[#071428]">
@@ -127,17 +115,17 @@ const HomePage = () => {
             {/* Badge */}
             <div className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-[#F4B41A]/40 bg-[#071428]/60 px-4 py-1.5 backdrop-blur-sm">
               <TrendingUp size={11} className="text-[#F4B41A]" />
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F4B41A]">Official Bulldogs Shop</p>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F4B41A]">Official Bulldogs Shop</p>
             </div>
 
             {/* Heading */}
-            <h1 className="text-6xl font-black leading-[0.98] tracking-tight text-white sm:text-7xl">
+            <h1 className="text-6xl font-black leading-[0.98] text-white sm:text-7xl">
               The <span className="text-[#F4B41A]">Official</span>
               <br />Bulldogs Store
             </h1>
 
             {/* Subtitle */}
-            <p className="mt-4 text-sm leading-relaxed text-blue-200/65 sm:text-[15px]">
+            <p className="mt-4 text-sm leading-relaxed text-blue-200/80 sm:text-[15px]">
               Your one-stop official shop for National University merchandise —
               uniforms, apparel, accessories, and more, all under the Bulldog badge.
             </p>
@@ -165,7 +153,7 @@ const HomePage = () => {
       {/* ── Category Chips ── */}
       <section className="relative z-10 border-y border-white/5 bg-[#0F2C59]/80 backdrop-blur-sm px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl flex flex-col sm:flex-row sm:items-center gap-4">
-          <p className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-blue-300/40">Browse by Category</p>
+          <p className="shrink-0 text-xs font-bold uppercase tracking-widest text-blue-300/80">Browse by Category</p>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map(({ label, icon: Icon, color }) => (
               <Link
@@ -194,12 +182,12 @@ const HomePage = () => {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Flame size={14} className="text-[#F4B41A]" />
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#F4B41A]/70">Just Arrived</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-[#F4B41A]">Just Arrived</p>
               </div>
-              <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">Featured Products</h2>
+              <h2 className="text-2xl font-black text-white sm:text-3xl">Featured Products</h2>
             </div>
             <Link to="/products"
-              className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-blue-300/60 hover:border-[#F4B41A]/30 hover:text-[#F4B41A] transition-all">
+              className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-blue-300/80 hover:border-[#F4B41A]/30 hover:text-[#F4B41A] transition-all">
               View all <ChevronRight size={14} />
             </Link>
           </div>
@@ -220,33 +208,13 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── Flash Sale Banner ── */}
-      <section className="mx-4 mb-8 sm:mx-6 lg:mx-8">
-        <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl bg-gradient-to-r from-[#F4B41A] to-[#FFC72C] p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#0A192F]/20 backdrop-blur-sm">
-              <Zap size={28} className="text-[#0A192F]" />
-            </div>
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-[#0A192F]/60">Limited Time Only</p>
-              <h3 className="text-2xl font-black text-[#0A192F]">Flash Sale is Live 🔥</h3>
-              <p className="text-sm text-[#0A192F]/70">Up to 30% off on selected campus essentials</p>
-            </div>
-          </div>
-          <Link to="/products"
-            className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-[#0A192F] px-7 py-3.5 text-sm font-bold text-[#F4B41A] shadow-lg transition-all hover:bg-[#0F2C59] hover:shadow-xl active:scale-95">
-            Shop Sale <ArrowRight size={16} />
-          </Link>
-        </div>
-      </section>
-
       {/* ── Browse by Section ── */}
       <section className="border-t border-white/5 bg-[#0F2C59]/40 px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-6 flex items-end justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#F4B41A]/60 mb-2">Shop Sections</p>
-              <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">Browse by Section</h2>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#F4B41A] mb-2">Shop Sections</p>
+              <h2 className="text-2xl font-black text-white sm:text-3xl">Browse by Section</h2>
             </div>
           </div>
           <div className="grid gap-5 md:grid-cols-3">
@@ -277,7 +245,7 @@ const HomePage = () => {
                 className="group relative overflow-hidden rounded-2xl border border-white/5 bg-[#112240] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#F4B41A]/20 hover:shadow-2xl hover:shadow-black/30">
                 {/* Badge */}
                 <div className="absolute top-3 left-3 z-10">
-                  <span className="rounded-full bg-[#F4B41A] px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-[#0A192F]">
+                  <span className="rounded-full bg-[#F4B41A] px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-[#0A192F]">
                     {card.badge}
                   </span>
                 </div>
@@ -287,8 +255,8 @@ const HomePage = () => {
                 </div>
                 <div className="relative p-5">
                   <h3 className="text-base font-bold text-white mb-1">{card.title}</h3>
-                  <p className="text-sm text-blue-300/60 mb-4">{card.desc}</p>
-                  <Link to="/products"
+                  <p className="text-sm text-blue-300/80 mb-4">{card.desc}</p>
+                  <Link to={`/products?category=${encodeURIComponent(card.title)}`}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-[#F4B41A]/10 border border-[#F4B41A]/20 px-3 py-1.5 text-xs font-semibold text-[#F4B41A] hover:bg-[#F4B41A]/20 transition-all">
                     {card.cta} <ArrowRight size={12} />
                   </Link>
@@ -299,35 +267,18 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── Trust Badges ── */}
-      <section className="border-t border-white/5 px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl grid gap-5 sm:grid-cols-3">
-          {TRUST.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="group flex items-start gap-4 rounded-2xl border border-white/5 bg-[#112240] p-6 transition-all duration-300 hover:border-[#F4B41A]/20 hover:shadow-lg hover:shadow-[#F4B41A]/5">
-              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#F4B41A]/10 group-hover:bg-[#F4B41A]/20 transition-colors">
-                <Icon size={20} className="text-[#F4B41A]" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white">{title}</p>
-                <p className="text-xs text-blue-300/50 mt-1 leading-relaxed">{desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── Footer CTA ── */}
       <section className="border-t border-white/5 bg-[#0F2C59]/50 px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#F4B41A]/20 bg-[#F4B41A]/10 px-4 py-1.5">
             <Award size={12} className="text-[#F4B41A]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#F4B41A]">Official NU Merchandise</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-[#F4B41A]">Official NU Merchandise</span>
           </div>
-          <h2 className="text-3xl font-black tracking-tight text-white mb-3 sm:text-4xl">
+          <h2 className="text-3xl font-black text-white mb-3 sm:text-4xl">
             Shop the <span className="text-[#F4B41A]">Official</span> Bulldogs Collection
           </h2>
-          <p className="text-sm text-blue-300/60 mb-5 leading-relaxed">
-            Hundreds of official NU products — uniforms, apparel, and accessories — all in one place.
+          <p className="text-sm text-blue-300/80 mb-5 leading-relaxed">
+            Campus apparel, study supplies, and everyday essentials — all in one place, ready for pickup on campus.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link to="/products"

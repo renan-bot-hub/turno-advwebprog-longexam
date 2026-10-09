@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createOrder } from '../../api/orders.js';
+import { categoryName } from '../../api/products.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import {
   ShoppingCart, Minus, Plus, Trash2, ArrowRight,
-  ShoppingBag, CheckCircle2, AlertCircle, Tag, Truck
+  ShoppingBag, CheckCircle2, AlertCircle, Tag, Store
 } from 'lucide-react';
 
 const CartPage = () => {
@@ -60,15 +61,15 @@ const CartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A192F] font-['Outfit']">
+    <div className="min-h-screen bg-[#0A192F]">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
 
         {/* Page Header */}
         <div className="mb-8">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#F4B41A]/60 mb-2">Checkout</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-[#F4B41A] mb-2">Checkout</p>
           <h1 className="text-3xl font-black text-white sm:text-4xl">Shopping Cart</h1>
           {cart.length > 0 && (
-            <p className="mt-1 text-sm text-blue-300/50">{itemCount} item{itemCount !== 1 ? 's' : ''} in your cart</p>
+            <p className="mt-1 text-sm text-blue-300/80">{itemCount} item{itemCount !== 1 ? 's' : ''} in your cart</p>
           )}
         </div>
 
@@ -89,7 +90,7 @@ const CartPage = () => {
           <div className="rounded-2xl border border-white/5 bg-[#112240] py-20 text-center">
             <ShoppingBag size={64} className="mx-auto text-white/10 mb-4" />
             <h2 className="text-xl font-black text-white mb-2">Your cart is empty</h2>
-            <p className="text-sm text-blue-300/40 mb-8">Browse our collection and add items to your cart.</p>
+            <p className="text-sm text-blue-300/80 mb-8">Browse our collection and add items to your cart.</p>
             <Link to="/products"
               className="inline-flex items-center gap-2 rounded-xl bg-[#F4B41A] px-7 py-3.5 text-sm font-bold text-[#0A192F] shadow-lg shadow-[#F4B41A]/20 transition-all hover:bg-[#FFC72C] hover:shadow-xl active:scale-95">
               Browse Products <ArrowRight size={16} />
@@ -111,7 +112,7 @@ const CartPage = () => {
 
                   {/* Details */}
                   <div className="flex-1 min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#F4B41A]/60">{item.category}</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#F4B41A]">{categoryName(item)}</span>
                     <Link to={`/products/${item._id}`}>
                       <h3 className="text-sm font-bold text-white truncate hover:text-[#F4B41A] transition">{item.title}</h3>
                     </Link>
@@ -120,13 +121,15 @@ const CartPage = () => {
 
                   {/* Quantity Controls */}
                   <div className="flex items-center rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-                    <button onClick={() => updateQty(item._id, item.quantity - 1)}
-                      className="flex h-9 w-9 items-center justify-center text-white/60 hover:bg-white/10 hover:text-white transition">
+                    <button onClick={() => updateQty(item._id, item.quantity - 1)} disabled={item.quantity <= 1}
+                      aria-label={`Decrease quantity of ${item.title}`}
+                      className="disabled:opacity-40 flex h-9 w-9 items-center justify-center text-white/60 hover:bg-white/10 hover:text-white transition">
                       <Minus size={13} />
                     </button>
                     <span className="w-10 text-center text-sm font-bold text-white">{item.quantity}</span>
                     <button
                       onClick={() => updateQty(item._id, Math.min(item.stock ?? 99, item.quantity + 1))}
+                      aria-label={`Increase quantity of ${item.title}`}
                       className="flex h-9 w-9 items-center justify-center text-white/60 hover:bg-white/10 hover:text-white transition">
                       <Plus size={13} />
                     </button>
@@ -139,6 +142,7 @@ const CartPage = () => {
 
                   {/* Remove */}
                   <button onClick={() => removeItem(item._id)}
+                    aria-label={`Remove ${item.title} from cart`}
                     className="text-white/20 hover:text-red-400 transition-colors">
                     <Trash2 size={16} />
                   </button>
@@ -153,7 +157,7 @@ const CartPage = () => {
               {/* Line items */}
               <div className="space-y-2.5 mb-5 max-h-48 overflow-y-auto">
                 {cart.map((i) => (
-                  <div key={i._id} className="flex justify-between text-xs text-blue-300/60">
+                  <div key={i._id} className="flex justify-between text-xs text-blue-300/80">
                     <span className="truncate max-w-[160px]">{i.title} × {i.quantity}</span>
                     <span className="font-bold text-white/70 ml-2">₱{(i.price * i.quantity).toLocaleString()}</span>
                   </div>
@@ -163,11 +167,11 @@ const CartPage = () => {
               {/* Divider */}
               <div className="border-t border-white/10 pt-4 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-blue-300/60">Subtotal</span>
+                  <span className="text-blue-300/80">Subtotal</span>
                   <span className="font-bold text-white">₱{subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm mt-2">
-                  <span className="text-blue-300/60">Delivery</span>
+                  <span className="text-blue-300/80">Pickup</span>
                   <span className="font-bold text-emerald-400">Free</span>
                 </div>
               </div>
@@ -180,8 +184,8 @@ const CartPage = () => {
 
               {/* Payment method badge */}
               <div className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-3 py-2.5 mb-5">
-                <Tag size={13} className="text-blue-300/50" />
-                <span className="text-xs text-blue-300/50 font-medium">Payment: Cash on Delivery (COD)</span>
+                <Tag size={13} className="text-blue-300/80" />
+                <span className="text-xs text-blue-300/80 font-medium">Payment: Cash on Pickup</span>
               </div>
 
               <button onClick={handlePlaceOrder} disabled={loading || cart.length === 0}
@@ -194,8 +198,8 @@ const CartPage = () => {
               </button>
 
               <div className="mt-4 flex items-center gap-2 text-center justify-center">
-                <Truck size={12} className="text-blue-300/30" />
-                <p className="text-[10px] text-blue-300/30">Campus delivery — free for all orders</p>
+                <Store size={12} className="text-blue-300/80" />
+                <p className="text-xs text-blue-300/80">Pick up at the NU campus store when your order is ready</p>
               </div>
             </div>
           </div>

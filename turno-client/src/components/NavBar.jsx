@@ -11,9 +11,13 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 const customerLinks = [
   { label: 'Home', to: '/', end: true },
+  { label: 'About', to: '/about' },
   { label: 'Products', to: '/products' },
   { label: 'My Orders', to: '/orders' },
 ];
+
+// Show the shortcut key the visitor's keyboard actually has
+const SHORTCUT_KEY = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? '⌘' : 'Ctrl';
 
 const adminLinks = [
   { label: 'Products', to: '/admin/products', icon: Package },
@@ -105,7 +109,7 @@ const NavBar = () => {
     <>
 
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 ${
+        className={`app-header sticky top-0 z-50 transition-all duration-300 ${
           scrolled
             ? 'bg-[#0A192F]/97 shadow-xl shadow-black/30 backdrop-blur-md border-b border-white/10'
             : 'bg-[#0A192F] border-b border-white/5'
@@ -126,8 +130,8 @@ const NavBar = () => {
             <div className="leading-tight">
               <p className="text-sm font-bold tracking-tight text-white">BulldogEx</p>
               {isAdmin
-                ? <p className="text-[9px] font-semibold uppercase tracking-widest text-[#F4B41A]">Admin Panel</p>
-                : <p className="text-[9px] font-medium uppercase tracking-widest text-blue-300/70">Campus Shop</p>
+                ? <p className="text-[11px] font-semibold uppercase tracking-widest text-[#F4B41A]">Admin Panel</p>
+                : <p className="text-[11px] font-medium uppercase tracking-widest text-blue-300/70">Campus Shop</p>
               }
             </div>
           </NavLink>
@@ -159,24 +163,25 @@ const NavBar = () => {
             {/* Search trigger */}
             <button
               onClick={() => setSearchOpen(true)}
-              className="hidden sm:flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-blue-200/60 hover:border-[#F4B41A]/30 hover:text-white transition-all group"
+              className="hidden sm:flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-blue-200/80 hover:border-[#F4B41A]/30 hover:text-white transition-all group"
             >
               <Search size={13} />
               <span className="hidden lg:inline">Search products…</span>
-              <kbd className="hidden lg:inline-flex items-center gap-0.5 rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-blue-200/40 group-hover:border-white/20">
-                <span className="text-[10px]">⌘</span>K
+              <kbd className="hidden lg:inline-flex items-center gap-0.5 rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-xs text-blue-200/80 group-hover:border-white/20">
+                {SHORTCUT_KEY} K
               </kbd>
             </button>
 
-            {/* Cart (customers only) */}
-            {user && !isAdmin && (
+            {/* Cart (guests and customers; admins don't shop) */}
+            {!isAdmin && (
               <Link
                 to="/cart"
-                className="relative flex h-8 w-8 items-center justify-center rounded-lg text-blue-200/70 hover:bg-white/10 hover:text-white transition-all"
+                aria-label={`Cart, ${cartCount} item${cartCount === 1 ? '' : 's'}`}
+                className="relative flex h-9 w-9 items-center justify-center rounded-lg text-blue-200/80 hover:bg-white/10 hover:text-white transition-all"
               >
-                <ShoppingCart size={16} />
+                <ShoppingCart size={18} />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#F4B41A] text-[9px] font-black text-[#0A192F]">
+                  <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F4B41A] px-1 text-[11px] font-black text-[#0A192F]">
                     {cartCount > 9 ? '9+' : cartCount}
                   </span>
                 )}
@@ -190,18 +195,18 @@ const NavBar = () => {
                   onClick={() => setProfileOpen((v) => !v)}
                   className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 transition-all hover:border-[#F4B41A]/30 hover:bg-white/10"
                 >
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#F4B41A] text-[9px] font-black text-[#0A192F]">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#F4B41A] text-[11px] font-black text-[#0A192F]">
                     {user.firstName?.[0]}{user.lastName?.[0]}
                   </div>
                   <span className="hidden text-xs font-medium text-white sm:block">{user.firstName}</span>
-                  <ChevronDown size={12} className={`text-blue-200/50 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={12} className={`text-blue-200/80 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {profileOpen && (
                   <div className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-white/10 bg-[#0F2C59] p-1 shadow-2xl shadow-black/40">
                     <div className="px-3 py-2 border-b border-white/10 mb-1">
                       <p className="text-xs font-semibold text-white">{user.firstName} {user.lastName}</p>
-                      <p className="text-[10px] text-blue-300/60 truncate">{user.email}</p>
+                      <p className="text-xs text-blue-300/80 truncate">{user.email}</p>
                     </div>
                     {!isAdmin && (
                       <>
@@ -217,7 +222,7 @@ const NavBar = () => {
                           className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-blue-100/80 hover:bg-white/10 hover:text-white transition-colors">
                           <ShoppingCart size={13} /> My Cart
                           {cartCount > 0 && (
-                            <span className="ml-auto rounded-full bg-[#F4B41A] px-1.5 py-0.5 text-[9px] font-black text-[#0A192F]">{cartCount}</span>
+                            <span className="ml-auto rounded-full bg-[#F4B41A] px-1.5 py-0.5 text-[11px] font-black text-[#0A192F]">{cartCount}</span>
                           )}
                         </Link>
                       </>
@@ -253,6 +258,8 @@ const NavBar = () => {
 
             {/* Mobile menu toggle */}
             <button onClick={() => setMenuOpen((v) => !v)}
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
               className="flex h-8 w-8 items-center justify-center rounded-lg text-blue-200/70 hover:bg-white/10 hover:text-white transition-all md:hidden">
               {menuOpen ? <X size={16} /> : <Menu size={16} />}
             </button>
@@ -308,27 +315,28 @@ const NavBar = () => {
       {/* ── Global Search Modal ── */}
       {searchOpen && (
         <div className="fixed inset-0 z-[60] flex items-start justify-center bg-black/60 backdrop-blur-sm pt-20 px-4">
-          <div ref={searchRef} className="w-full max-w-xl rounded-2xl border border-white/10 bg-[#0F2C59] shadow-2xl overflow-hidden">
+            <div ref={searchRef} className="surface-glass w-full max-w-xl overflow-hidden rounded-2xl border-white/15 shadow-2xl shadow-black/50">
             <form onSubmit={handleSearch} className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
-              <Search size={16} className="text-blue-300/60 flex-shrink-0" />
+                <Search size={17} className="flex-shrink-0 text-[#FFD166]" />
               <input
                 autoFocus
                 type="text"
                 value={searchVal}
                 onChange={(e) => setSearchVal(e.target.value)}
                 placeholder="Search campus products…"
-                className="flex-1 bg-transparent text-sm text-white placeholder:text-blue-300/40 outline-none"
+                  className="flex-1 bg-transparent text-[15px] text-white placeholder:text-[#8BA6BB]/70 outline-none"
               />
-              <kbd className="text-[10px] text-blue-300/40 border border-white/10 rounded px-1.5 py-0.5">ESC</kbd>
+                <kbd className="rounded-md border border-white/15 bg-white/5 px-2 py-1 text-xs font-semibold tracking-wider text-[#8BA6BB]">ESC</kbd>
             </form>
-            <div className="px-4 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-blue-300/40 mb-2">Quick Categories</p>
+              <div className="px-5 py-4">
+                <p className="eyebrow mb-3">Quick categories</p>
               <div className="flex flex-wrap gap-2">
-                {['Uniforms', 'Books', 'Gadgets', 'Apparel', 'Essentials'].map((cat) => (
-                  <button key={cat} type="button"
-                    onClick={() => { navigate(`/products?search=${cat}`); setSearchOpen(false); setSearchVal(''); }}
-                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-blue-200/70 hover:border-[#F4B41A]/50 hover:text-[#F4B41A] transition-all">
-                    {cat}
+                {['Campus Apparel', 'Study Supplies', 'Daily Essentials'].map((category) => (
+                  <button key={category} type="button"
+                    onClick={() => { navigate(`/products?category=${encodeURIComponent(category)}`); setSearchOpen(false); setSearchVal(''); }}
+                    className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-[#BFDCEE]/75 transition-all hover:border-[#F4B41A]/60 hover:bg-[#F4B41A]/10 hover:text-[#FFD166]"
+                    aria-label={`Browse ${category}`}>
+                    {category}
                   </button>
                 ))}
               </div>

@@ -7,15 +7,21 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "seed": "node src/seed.js",
-    "check": "node --check src/app.js && node --check src/server.js && node --check src/routes/products.js && node --check src/seed.js"
+    "check": "node -e \"const fs=require('fs'),path=require('path'),{execFileSync}=require('child_process');const walk=d=>fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(d,e.name)):e.name.endsWith('.js')?[path.join(d,e.name)]:[]);for(const f of walk('src'))execFileSync(process.execPath,['--check',f],{stdio:'inherit'});console.log('All server files OK');\""
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^8.9.5"
+    "mongodb-memory-server": "^11.3.0",
+    "mongoose": "^8.9.5",
+    "multer": "^2.4.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

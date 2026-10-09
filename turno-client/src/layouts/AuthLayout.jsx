@@ -1,16 +1,16 @@
 import { Outlet, Link } from 'react-router-dom';
 import logo from '../assets/img/nubdexchange_logo.png';
-import { Shield, Truck, Star } from 'lucide-react';
+import { Shield, Store, Star } from 'lucide-react';
 
 const PERKS = [
   { icon: Shield, text: 'Official NU Store' },
-  { icon: Truck, text: 'Campus Delivery' },
+  { icon: Store, text: 'Campus Pickup' },
   { icon: Star, text: 'Quality Guaranteed' },
 ];
 
 const AuthLayout = () => {
   return (
-    <div className="grid min-h-screen h-screen grid-cols-1 overflow-hidden font-['Outfit'] lg:grid-cols-2">
+    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
 
       {/* ── Left Branding Panel (hidden on mobile) ── */}
       <div className="relative hidden overflow-hidden bg-[#00205B] lg:flex lg:flex-col">
@@ -24,13 +24,13 @@ const AuthLayout = () => {
             </div>
             <div>
               <p className="text-base font-bold text-white">BulldogEx</p>
-              <p className="text-[9px] font-medium uppercase tracking-widest text-[#F4B41A]/70">Official Campus Shop</p>
+              <p className="text-[11px] font-medium uppercase tracking-widest text-[#F4B41A]">Official Campus Shop</p>
             </div>
           </Link>
 
           {/* Headline */}
           <div className="my-auto max-w-lg py-12">
-            <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-[#F4B41A]">National University</p>
+            <p className="mb-4 text-xs font-bold uppercase tracking-widest text-[#F4B41A]">National University</p>
             <h2 className="text-5xl font-black leading-[1.05] text-white xl:text-6xl">
               Your Campus.<br />
               Your <span className="text-[#F4B41A]">Store.</span>
@@ -53,7 +53,7 @@ const AuthLayout = () => {
           </div>
 
           {/* Bottom quote */}
-          <p className="text-[10px] text-blue-300/30 uppercase tracking-widest">
+          <p className="text-xs text-blue-300/80 uppercase tracking-widest">
             © {new Date().getFullYear()} BulldogEx — All rights reserved
           </p>
         </div>
@@ -67,7 +67,7 @@ const AuthLayout = () => {
         <div className="absolute left-5 top-5 z-20">
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-blue-300/40 transition-colors hover:text-[#F2A900]"
+            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-blue-300/80 transition-colors hover:text-[#F2A900]"
           >
             ← Back to Store
           </Link>
@@ -78,7 +78,7 @@ const AuthLayout = () => {
           <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#F4B41A]/30 bg-white/5 shadow-[0_0_40px_rgba(244,180,26,0.15)] backdrop-blur-sm mb-3">
             <img src={logo} alt="BulldogEx" className="object-contain h-10 w-10" />
           </div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#F4B41A]/70">Official Bulldogs Shop</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-[#F4B41A]">Official Bulldogs Shop</p>
         </div>
 
         {/* Form Card */}

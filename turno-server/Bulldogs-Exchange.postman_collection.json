@@ -1,350 +1,1965 @@
 {
   "info": {
     "name": "Bulldogs Exchange API",
+    "description": "Run \"Auth → Login as Admin\" and \"Auth → Register Customer\" first. They save the tokens automatically.\n\nRequests use the admin token unless they say (Customer) or (Public).\nProducts: uses the products already in your database. productId is filled in by \"List products\". Nothing creates or changes products unless you edit a request body, and \"Delete product\" only runs after you set deleteProductId.\nYou can run the whole collection top to bottom with the Collection Runner.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{adminToken}}",
+        "type": "string"
+      }
+    ]
+  },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:5000/api" },
-    { "key": "productId", "value": "replace-with-product-id" },
-    { "key": "categoryId", "value": "replace-with-category-id" },
-    { "key": "userId", "value": "replace-with-user-id" },
-    { "key": "orderId", "value": "replace-with-order-id" },
-    { "key": "reviewId", "value": "replace-with-review-id" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@bulldogex.com"
+    },
+    {
+      "key": "adminPassword",
+      "value": "admin1234"
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "customerEmail",
+      "value": ""
+    },
+    {
+      "key": "customerPassword",
+      "value": "secret12"
+    },
+    {
+      "key": "customerToken",
+      "value": ""
+    },
+    {
+      "key": "customerId",
+      "value": ""
+    },
+    {
+      "key": "productId",
+      "value": ""
+    },
+    {
+      "key": "productTitle",
+      "value": ""
+    },
+    {
+      "key": "productCategory",
+      "value": ""
+    },
+    {
+      "key": "productPrice",
+      "value": ""
+    },
+    {
+      "key": "productStock",
+      "value": ""
+    },
+    {
+      "key": "deleteProductId",
+      "value": ""
+    },
+    {
+      "key": "categoryId",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "reviewId",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "supplierId",
+      "value": ""
+    }
   ],
   "item": [
     {
-      "name": "Health Check",
+      "name": "Auth",
+      "description": "Log in first. The token is saved to a collection variable.",
       "item": [
         {
-          "name": "Health",
-          "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+          "name": "Health (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login as Admin (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "{",
+                  "  const result = pm.response.json();",
+                  "  pm.collectionVariables.set(\"adminToken\", result.token);",
+                  "  pm.test(\"Role is Admin\", () => pm.expect(result.user.role).to.eql(\"Admin\"));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Register Customer (Public)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// A new email each run, so registering never conflicts",
+                  "pm.collectionVariables.set(\"customerEmail\", `juan.${Date.now()}@test.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "{",
+                  "  const result = pm.response.json();",
+                  "  pm.collectionVariables.set(\"customerToken\", result.token);",
+                  "  pm.collectionVariables.set(\"customerId\", result.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Dela Cruz\",\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login as Customer (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "{",
+                  "  pm.collectionVariables.set(\"customerToken\", pm.response.json().token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login with wrong password (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"wrong-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Customer GET /api/v1/user/:id is forbidden (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/v1/user/{{customerId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Activity 4: user management is Admin only."
+          }
+        },
+        {
+          "name": "Customer edits own account (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/v1/user/{{customerId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Juan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Activity 4 enhancement: a user may edit their own account. Editing someone else returns 403."
+          }
+        },
+        {
+          "name": "Get my profile (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/auth/me",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update my profile (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "{",
+                  "  pm.test(\"Name updated\", () => pm.expect(pm.response.json().data.name).to.eql(\"Juan Santos\"));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/me",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Santos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Change password - wrong current (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/me/password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"not-my-password\",\n  \"newPassword\": \"newpass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
         }
       ]
     },
     {
-      "name": "Products (Base)",
+      "name": "Products",
+      "description": "Works with the products already in your database. Nothing here creates test products, and running the folder leaves your products unchanged.",
       "item": [
         {
-          "name": "List all products",
-          "request": { "method": "GET", "url": "{{baseUrl}}/product" }
+          "name": "List products (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "{",
+                  "  const products = pm.response.json().data;",
+                  "  pm.test(\"Has products\", () => pm.expect(products.length).to.be.above(0));",
+                  "  const pick = products.find((p) => p.stock > 0) || products[0];",
+                  "  if (pick) {",
+                  "    pm.collectionVariables.set(\"productId\", pick._id);",
+                  "    console.log(`Using product: ${pick.title} (${pick._id})`);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products?page=1&limit=50&sort=createdAt&order=desc",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Lists your existing products and remembers one (the first with stock) as productId for the other requests."
+          }
         },
         {
-          "name": "Pagination - page 1 limit 5",
-          "request": { "method": "GET", "url": "{{baseUrl}}/product?page=1&limit=5" }
+          "name": "Filter products by category and price (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "{",
+                  "  const products = pm.response.json().data;",
+                  "  pm.test(\"Sorted by price ascending\", () => {",
+                  "    for (let i = 1; i < products.length; i++) pm.expect(products[i].price).to.be.at.least(products[i - 1].price);",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products?category=Campus%20Apparel&minPrice=100&maxPrice=2000&sort=price&order=asc",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Change the category to one of yours."
+          }
         },
         {
-          "name": "Filter by category",
-          "request": { "method": "GET", "url": "{{baseUrl}}/product?category=Campus%20Apparel" }
+          "name": "Search products (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products?search=hoodie",
+            "auth": {
+              "type": "noauth"
+            }
+          }
         },
         {
-          "name": "Sort by price ascending",
-          "request": { "method": "GET", "url": "{{baseUrl}}/product?sort=price&order=asc" }
+          "name": "v1: combined query (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "{",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Standard response format\", () => pm.expect(body).to.include.keys(\"success\", \"message\", \"count\", \"data\"));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/v1/products?page=1&limit=5&category=Campus%20Apparel&supplier=Bulldog%20Merch%20Co.&sort=price&order=asc&search=hoodie",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Activity 3: pagination, filtering by category and supplier, keyword search, and sorting in one request, with the standard { success, message, count, data } response."
+          }
         },
         {
-          "name": "Get product by ID",
-          "request": { "method": "GET", "url": "{{baseUrl}}/product/{{productId}}" }
+          "name": "Get product (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "{",
+                  "  const product = pm.response.json().data;",
+                  "  pm.collectionVariables.set(\"productTitle\", product.title);",
+                  "  pm.collectionVariables.set(\"productCategory\", product.category._id);",
+                  "  pm.collectionVariables.set(\"productPrice\", product.price);",
+                  "  pm.collectionVariables.set(\"productStock\", product.stock);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{productId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Loads the current values of productId so \"Update product\" can start from them."
+          }
         },
         {
-          "name": "Create product",
+          "name": "Create product without token (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/products",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"nu-test-notebook\",\n  \"title\": \"Bulldog Study Notebook\",\n  \"category\": \"Study Supplies\",\n  \"price\": 299,\n  \"stock\": 20,\n  \"description\": \"A lined notebook for campus notes.\",\n  \"imageUrl\": \"\"\n}"
+              "raw": "{\n  \"name\": \"should-fail\",\n  \"title\": \"Should Fail\",\n  \"category\": \"Study Supplies\",\n  \"price\": 1,\n  \"stock\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            "url": "{{baseUrl}}/product"
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Shows that product changes are protected. Nothing is created."
           }
         },
         {
-          "name": "Update product",
+          "name": "Update product (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/products/{{productId}}",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"nu-test-notebook\",\n  \"title\": \"Bulldog Study Notebook - Updated\",\n  \"category\": \"Study Supplies\",\n  \"price\": 349,\n  \"stock\": 18,\n  \"description\": \"Updated campus notes notebook.\",\n  \"imageUrl\": \"\"\n}"
+              "raw": "{\n  \"title\": \"{{productTitle}}\",\n  \"category\": \"{{productCategory}}\",\n  \"price\": {{productPrice}},\n  \"stock\": {{productStock}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            "url": "{{baseUrl}}/product/{{productId}}"
+            "description": "Run \"Get product\" first. The body re-sends the product's current values, so running it as-is changes nothing. Replace a value (e.g. the price) to really edit it."
           }
         },
         {
-          "name": "Delete product",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/product/{{productId}}" }
-        }
-      ]
-    },
-    {
-      "name": "Products v1 (Advanced)",
-      "item": [
-        {
-          "name": "v1 - List all products",
-          "request": { "method": "GET", "url": "{{baseUrl}}/v1/product" }
+          "name": "Update product with image (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{productId}}",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "{{productTitle}}",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "{{productCategory}}",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "{{productPrice}}",
+                  "type": "text"
+                },
+                {
+                  "key": "stock",
+                  "value": "{{productStock}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "description": "Pick an image file for the \"image\" field to replace the product photo. Other fields re-send the current values. Needs the Cloudinary keys in .env."
+          }
         },
         {
-          "name": "v1 - Pagination",
-          "request": { "method": "GET", "url": "{{baseUrl}}/v1/product?page=1&limit=5" }
-        },
-        {
-          "name": "v1 - Filter by category",
-          "request": { "method": "GET", "url": "{{baseUrl}}/v1/product?category=Campus%20Apparel" }
-        },
-        {
-          "name": "v1 - Filter by category + supplier",
-          "request": { "method": "GET", "url": "{{baseUrl}}/v1/product?category=Campus%20Apparel&supplier=Nike" }
-        },
-        {
-          "name": "v1 - Keyword search",
-          "request": { "method": "GET", "url": "{{baseUrl}}/v1/product?search=jacket" }
-        },
-        {
-          "name": "v1 - Sort by price",
-          "request": { "method": "GET", "url": "{{baseUrl}}/v1/product?sort=price&order=asc" }
-        },
-        {
-          "name": "v1 - All combined (page + filter + sort + search)",
-          "request": { "method": "GET", "url": "{{baseUrl}}/v1/product?page=1&limit=5&category=Campus%20Apparel&sort=price&order=asc&search=jacket" }
-        },
-        {
-          "name": "v1 - Get product by ID",
-          "request": { "method": "GET", "url": "{{baseUrl}}/v1/product/{{productId}}" }
-        },
-        {
-          "name": "v1 - Create product",
+          "name": "Upload product image (Admin)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Without a chosen file this would only return \"Image file is required.\", so skip it",
+                  "const file = pm.request.body.formdata.find((field) => field.key === \"image\");",
+                  "if (!file || !file.src || (Array.isArray(file.src) && file.src.length === 0)) {",
+                  "  console.log(\"Skipped: choose an image file in the Body tab to upload one.\");",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [],
+            "url": "{{baseUrl}}/products/{{productId}}/upload-image",
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"nu-v1-jacket\",\n  \"title\": \"Bulldog Varsity Jacket\",\n  \"category\": \"Campus Apparel\",\n  \"supplier\": \"Nike\",\n  \"price\": 1299,\n  \"stock\": 10,\n  \"description\": \"Official NU varsity jacket.\",\n  \"imageUrl\": \"\"\n}"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
             },
-            "url": "{{baseUrl}}/v1/product"
+            "description": "Pick an image file (JPEG, PNG or WebP, max 5 MB) for the \"image\" field first; it replaces the photo of productId. Skipped when no file is chosen. Needs the Cloudinary keys in .env."
           }
         },
         {
-          "name": "v1 - Update product",
+          "name": "Delete product (Admin)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.collectionVariables.get(\"deleteProductId\")) {",
+                  "  console.log(\"Skipped: set the deleteProductId collection variable to delete a product.\");",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "{",
+                  "  pm.collectionVariables.set(\"deleteProductId\", \"\");",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"nu-v1-jacket\",\n  \"title\": \"Bulldog Varsity Jacket - Updated\",\n  \"category\": \"Campus Apparel\",\n  \"supplier\": \"Nike\",\n  \"price\": 1499,\n  \"stock\": 8,\n  \"description\": \"Updated NU varsity jacket.\",\n  \"imageUrl\": \"\"\n}"
-            },
-            "url": "{{baseUrl}}/v1/product/{{productId}}"
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{deleteProductId}}",
+            "description": "Deletes a real product, so it never runs by accident: set the \"deleteProductId\" collection variable to the _id of the product you want to delete first. Skipped while it is empty."
           }
-        },
-        {
-          "name": "v1 - Delete product",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/v1/product/{{productId}}" }
         }
       ]
     },
     {
       "name": "Categories",
+      "description": "Reading is public. Changes need the admin token.",
       "item": [
         {
-          "name": "List all categories",
-          "request": { "method": "GET", "url": "{{baseUrl}}/category" }
-        },
-        {
-          "name": "Get category by ID",
-          "request": { "method": "GET", "url": "{{baseUrl}}/category/{{categoryId}}" }
-        },
-        {
-          "name": "Create category",
+          "name": "List categories (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Study Supplies\",\n  \"description\": \"Notebooks, pens, and school essentials.\",\n  \"imageUrl\": \"\",\n  \"isActive\": true\n}"
-            },
-            "url": "{{baseUrl}}/category"
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/category",
+            "auth": {
+              "type": "noauth"
+            }
           }
         },
         {
-          "name": "Update category",
+          "name": "Create category (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "{",
+                  "  pm.collectionVariables.set(\"categoryId\", pm.response.json().data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/category",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Study Supplies - Updated\",\n  \"description\": \"Updated description.\",\n  \"isActive\": true\n}"
-            },
+              "raw": "{\n  \"name\": \"Test Category {{$timestamp}}\",\n  \"description\": \"Created from Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get category (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/category/{{categoryId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Update category (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/category/{{categoryId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Category {{$timestamp}}\",\n  \"description\": \"Updated from Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete category (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
             "url": "{{baseUrl}}/category/{{categoryId}}"
           }
-        },
-        {
-          "name": "Delete category",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/category/{{categoryId}}" }
-        }
-      ]
-    },
-    {
-      "name": "Users",
-      "item": [
-        {
-          "name": "List all users",
-          "request": { "method": "GET", "url": "{{baseUrl}}/user" }
-        },
-        {
-          "name": "Get user by ID",
-          "request": { "method": "GET", "url": "{{baseUrl}}/user/{{userId}}" }
-        },
-        {
-          "name": "Create user",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"dela Cruz\",\n  \"email\": \"juan@nu.edu.ph\",\n  \"password\": \"password123\",\n  \"role\": \"buyer\"\n}"
-            },
-            "url": "{{baseUrl}}/user"
-          }
-        },
-        {
-          "name": "Update user",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"dela Cruz - Updated\",\n  \"email\": \"juan@nu.edu.ph\",\n  \"isActive\": true\n}"
-            },
-            "url": "{{baseUrl}}/user/{{userId}}"
-          }
-        },
-        {
-          "name": "Delete user",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/user/{{userId}}" }
         }
       ]
     },
     {
       "name": "Orders",
+      "description": "Run \"Products → List products\" first so productId is set. The order is cancelled at the end, which puts the stock back.",
       "item": [
         {
-          "name": "List all orders",
-          "request": { "method": "GET", "url": "{{baseUrl}}/order" }
-        },
-        {
-          "name": "Filter orders by status",
-          "request": { "method": "GET", "url": "{{baseUrl}}/order?status=pending" }
-        },
-        {
-          "name": "Get order by ID",
-          "request": { "method": "GET", "url": "{{baseUrl}}/order/{{orderId}}" }
-        },
-        {
-          "name": "Create order",
+          "name": "Place order (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "{",
+                  "  pm.collectionVariables.set(\"orderId\", pm.response.json().data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/order",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"user\": \"{{userId}}\",\n  \"items\": [],\n  \"total\": 0,\n  \"shippingAddress\": \"123 NU Sampaloc, Manila\",\n  \"paymentMethod\": \"cash\"\n}"
+              "raw": "{\n  \"items\": [\n    {\n      \"product\": \"{{productId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"shippingAddress\": {\n    \"street\": \"551 M.F. Jhocson St\",\n    \"city\": \"Manila\",\n    \"province\": \"Metro Manila\",\n    \"zipCode\": \"1008\"\n  },\n  \"paymentMethod\": \"cod\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            "url": "{{baseUrl}}/order"
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Only product and quantity are needed. The server looks up the price and reserves stock."
           }
         },
         {
-          "name": "Update order status",
+          "name": "Place order - more than in stock (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/order",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"product\": \"{{productId}}\",\n      \"quantity\": 99999\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "My orders (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/order",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get order (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/order/{{orderId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "All orders - pending (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/order?status=pending"
+          }
+        },
+        {
+          "name": "Update order status (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/order/{{orderId}}",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"shipped\"\n}"
+              "raw": "{\n  \"status\": \"processing\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            "url": "{{baseUrl}}/order/{{orderId}}"
+            "description": "Status: pending, processing, ready, shipped, delivered, or cancelled."
           }
         },
         {
-          "name": "Delete order",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/order/{{orderId}}" }
+          "name": "Cancel order (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/order/{{orderId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Cancelling puts the items back in stock."
+          }
+        },
+        {
+          "name": "Delete order (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/order/{{orderId}}"
+          }
         }
       ]
     },
     {
       "name": "Reviews",
+      "description": "One review per customer per product.",
       "item": [
         {
-          "name": "List all reviews",
-          "request": { "method": "GET", "url": "{{baseUrl}}/review" }
-        },
-        {
-          "name": "Filter reviews by product",
-          "request": { "method": "GET", "url": "{{baseUrl}}/review?productId={{productId}}" }
-        },
-        {
-          "name": "Get review by ID",
-          "request": { "method": "GET", "url": "{{baseUrl}}/review/{{reviewId}}" }
-        },
-        {
-          "name": "Create review",
+          "name": "Create review (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "{",
+                  "  pm.collectionVariables.set(\"reviewId\", pm.response.json().data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/review",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"user\": \"{{userId}}\",\n  \"product\": \"{{productId}}\",\n  \"rating\": 5,\n  \"comment\": \"Great product! Highly recommended.\"\n}"
+              "raw": "{\n  \"product\": \"{{productId}}\",\n  \"rating\": 5,\n  \"comment\": \"Great quality, fast pickup!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            "url": "{{baseUrl}}/review"
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
           }
         },
         {
-          "name": "Update review",
+          "name": "Create duplicate review (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/review",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product\": \"{{productId}}\",\n  \"rating\": 4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List reviews for product (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/review?productId={{productId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Update review (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/review/{{reviewId}}",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Good product, updated review.\"\n}"
+              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Still great after a month.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            "url": "{{baseUrl}}/review/{{reviewId}}"
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
           }
         },
         {
-          "name": "Delete review",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/review/{{reviewId}}" }
+          "name": "Delete review (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/review/{{reviewId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
         }
       ]
     },
     {
-      "name": "Cart",
+      "name": "Carts",
+      "description": "Customers can only see and change their own cart.",
       "item": [
         {
-          "name": "Get cart by user ID",
-          "request": { "method": "GET", "url": "{{baseUrl}}/cart/{{userId}}" }
-        },
-        {
-          "name": "Create cart",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"user\": \"{{userId}}\",\n  \"items\": [],\n  \"total\": 0\n}"
-            },
-            "url": "{{baseUrl}}/cart"
-          }
-        },
-        {
-          "name": "Update cart",
+          "name": "Save my cart (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/cart/{{customerId}}",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [],\n  \"total\": 0\n}"
+              "raw": "{\n  \"items\": [\n    {\n      \"product\": \"{{productId}}\",\n      \"quantity\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            "url": "{{baseUrl}}/cart/{{userId}}"
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Prices come from the database; any price you send is ignored."
           }
         },
         {
-          "name": "Delete cart",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/cart/{{userId}}" }
+          "name": "Get my cart (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/cart/{{customerId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete my cart (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/cart/{{customerId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Suppliers",
+      "description": "Reading is public. Changes need the admin token.",
+      "item": [
+        {
+          "name": "List suppliers (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/v1/supplier",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Create supplier (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "{",
+                  "  pm.collectionVariables.set(\"supplierId\", pm.response.json().data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/supplier",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Supplier {{$timestamp}}\",\n  \"contactPerson\": \"Lea Santos\",\n  \"email\": \"lea@supplier.test\",\n  \"phone\": \"(02) 8123-4567\",\n  \"address\": \"Manila\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create supplier with bad email (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/supplier",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bad Supplier\",\n  \"email\": \"not-an-email\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Shows the validation error response."
+          }
+        },
+        {
+          "name": "Get supplier (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/supplier/{{supplierId}}",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Update supplier (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/supplier/{{supplierId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactPerson\": \"Lea Santos-Cruz\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete supplier (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/supplier/{{supplierId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Audit Logs",
+      "description": "Admin only. Every API request is saved in the logs collection.",
+      "item": [
+        {
+          "name": "Latest logs (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "{",
+                  "  pm.test(\"Has log entries\", () => pm.expect(pm.response.json().count).to.be.above(0));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/v1/log?limit=10"
+          }
+        },
+        {
+          "name": "Failed requests only (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/log?level=warn&limit=10"
+          }
+        },
+        {
+          "name": "Customer cannot read logs (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/log",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "Admin only.",
+      "item": [
+        {
+          "name": "List users (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/user"
+          }
+        },
+        {
+          "name": "Get user (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/user/{{customerId}}"
+          }
+        },
+        {
+          "name": "Create user (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "{",
+                  "  pm.collectionVariables.set(\"userId\", pm.response.json().data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/user",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Reyes\",\n  \"email\": \"ana.{{$timestamp}}@test.com\",\n  \"password\": \"secret12\",\n  \"role\": \"Customer\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Deactivate user (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/user/{{userId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Activate user (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/user/{{userId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Customer cannot list users (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/user",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete user (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/user/{{userId}}"
+          }
         }
       ]
     }

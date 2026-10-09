@@ -1,137 +1,138 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, ShoppingBag, Store, Wallet, Search } from 'lucide-react';
 import Button from '../../components/Button';
-import logo from '../../assets/img/nubdexchange_logo.png';
+import banner from '../../assets/img/nu_bulldogex_banner_clean.jpg';
+import { getProducts, categoryName } from '../../api/products.js';
+
+const STEPS = [
+  { icon: Search, title: 'Browse the catalog', text: 'Search or filter by category to find campus apparel, study supplies, and daily essentials.' },
+  { icon: ShoppingBag, title: 'Place your order', text: 'Add items to your cart and check out. Prices and stock are confirmed the moment you order.' },
+  { icon: Store, title: 'Pick it up on campus', text: 'Track your order under My Orders and claim it at the campus store once it is marked ready.' },
+];
 
 const AboutPage = () => {
+  const [products, setProducts] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    getProducts({ limit: 100 })
+      .then((res) => setProducts(res.data.data || []))
+      .catch(() => setProducts([]))
+      .finally(() => setLoaded(true));
+  }, []);
+
+  // One tile per category, using a real product photo from that category
+  const categories = [...new Set(products.map(categoryName))].filter(Boolean).map((name) => ({
+    name,
+    imageUrl: products.find((item) => categoryName(item) === name && item.imageUrl)?.imageUrl,
+    count: products.filter((item) => categoryName(item) === name).length,
+  }));
+
+  const stats = [
+    { value: loaded ? products.length : '…', label: 'Products' },
+    { value: loaded ? categories.length : '…', label: 'Categories' },
+    { value: 'Free', label: 'Campus pickup' },
+    { value: 'Cash', label: 'Pay on pickup' },
+  ];
+
   return (
-    <div className="flex w-full flex-col gap-6 bg-[#0A192F] font-['Outfit']">
-      
-      <section className="border-y border-white/10 bg-[#112240] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
-          <div className="rounded-3xl border border-white/10 bg-[#0F2C59] p-6">
-            <div className="flex min-h-72 items-center justify-center rounded-[1.25rem] bg-[#0A192F]">
-              <img 
-                src={logo} 
-                alt="BulldogEx" 
-                className="h-32 w-32 rounded-full border-4 border-blue-900 bg-white object-contain shadow-md" 
+    <div className="bg-[#0A192F]">
+      {/* ── Intro ── */}
+      <section className="border-b border-white/10 bg-[#112240]">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-8">
+          {/* The mascot fills the left half of the banner: a box with that shape, cropped from the
+              left, frames just the bulldog, and the box itself is centered in the column */}
+          <div className="flex justify-center">
+            <div className="aspect-[16/13] w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-[#071428]">
+              <img
+                src={banner}
+                alt="NU Bulldog mascot"
+                className="h-full w-full object-cover object-left"
               />
             </div>
           </div>
 
           <div>
-            <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.28em] text-yellow-500">
-              About Store
-            </p>
-            <h1 className="max-w-xl text-3xl font-bold leading-tight text-white sm:text-4xl">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[#F4B41A]">About BulldogEx</p>
+            <h1 className="max-w-xl text-4xl font-black leading-tight text-white">
               A campus shop focused on useful products and simple ordering.
             </h1>
-            <p className="mt-4 max-w-lg text-sm leading-7 text-blue-200/60 sm:text-base font-medium">
-              BulldogEx Shop keeps the low-fidelity layout system while presenting clear product categories, quick actions, and straightforward store information.
+            <p className="mt-4 max-w-xl text-base leading-7 text-blue-200/80">
+              BulldogEx brings Bulldog merchandise and everyday campus needs into one place. Browse the catalog,
+              order online, and pick up your items at the campus store — no shipping fees, no waiting for delivery.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button to="/" variant="primary">
-                Back Home
-              </Button>
-              <Button to="/products">Open Products</Button>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Button to="/products" variant="primary">Shop Products</Button>
+              <Button to="/">Back Home</Button>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-y border-white/10 bg-[#112240] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <div className="mb-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-yellow-500">
-            Store Overview
-          </p>
-          <h2 className="mt-2 text-2xl font-bold text-white">Quick store blocks</h2>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[['08','Items'],['06','Categories'],['03','Pickup Slots'],['24','Orders']].map(([n, l]) => (
-            <div key={l} className="rounded-3xl border border-white/10 bg-[#0F2C59] p-5 transition-all hover:border-[#F4B41A]/40">
-              <p className="text-2xl font-black text-white">{n}</p>
-              <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.24em] text-blue-300/60">{l}</p>
+      {/* ── Store at a glance ── */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#F4B41A]">Store at a glance</p>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map(({ value, label }) => (
+            <div key={label} className="rounded-2xl border border-white/10 bg-[#112240] p-6">
+              <p className="text-3xl font-black text-white">{value}</p>
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80">{label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="border-y border-white/10 bg-[#112240] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-yellow-500">
-              Store Flow
-            </p>
-            <h2 className="mt-2 text-2xl font-bold text-white">Stacked shopping wireframe</h2>
-            
-            <div className="mt-6 space-y-4">
-              <article className="rounded-3xl border border-white/10 border-l-4 border-l-[#F4B41A] bg-[#0F2C59] p-5 transition-all hover:shadow-md">
-                <h3 className="text-lg font-bold text-white">Curated Catalog</h3>
-                <p className="mt-3 text-sm leading-6 text-blue-200/60 font-medium">
-                  Products are grouped by daily need so shoppers can scan faster.
-                </p>
-              </article>
-
-              <article className="rounded-3xl border border-white/10 border-l-4 border-l-[#F4B41A] bg-[#0F2C59] p-5 transition-all hover:shadow-md">
-                <h3 className="text-lg font-bold text-white">Simple Checkout</h3>
-                <p className="mt-3 text-sm leading-6 text-blue-200/60 font-medium">
-                  Product pages keep price, stock, and action buttons easy to find.
-                </p>
-              </article>
-
-              <article className="rounded-3xl border border-white/10 border-l-4 border-l-[#F4B41A] bg-[#0F2C59] p-5 transition-all hover:shadow-md">
-                <h3 className="text-lg font-bold text-white">Pickup Ready</h3>
-                <p className="mt-3 text-sm leading-6 text-blue-200/60 font-medium">
-                  Store information stays direct for students who need quick order updates.
-                </p>
-              </article>
-            </div>
+      {/* ── How it works + categories ── */}
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 pb-16 sm:px-6 lg:grid-cols-[1fr_1fr] lg:px-8">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#F4B41A]">How it works</p>
+          <h2 className="mt-2 text-2xl font-black text-white">From browsing to pickup in three steps</h2>
+          <ol className="mt-6 space-y-4">
+            {STEPS.map(({ icon: Icon, title, text }, i) => (
+              <li key={title} className="flex gap-4 rounded-2xl border border-white/10 border-l-4 border-l-[#F4B41A] bg-[#112240] p-5">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#F4B41A]/15 text-[#F4B41A]">
+                  <Icon size={18} aria-hidden="true" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">{i + 1}. {title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-blue-200/80">{text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-white/10 bg-[#112240] p-5">
+            <Wallet size={18} className="flex-shrink-0 text-[#F4B41A]" aria-hidden="true" />
+            <p className="text-sm text-blue-200/80">Payment is cash on pickup. You only pay when you collect your order.</p>
           </div>
+        </div>
 
-          <div className="rounded-3xl border border-white/10 bg-[#0F2C59] p-5 flex flex-col h-full">
-            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-yellow-500">
-              Category Grid
-            </p>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2 flex-grow">
-              
-              <div className="group relative aspect-square overflow-hidden rounded-[1.25rem] border-2 border-blue-900 bg-blue-100">
-                <img 
-                  src="https://varsitylifestyleco.com/cdn/shop/files/NU1_c809a5da-e148-4e16-95ce-8084f3150cca.jpg" 
-                  alt="Daily Essentials" 
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-blue-900/10 group-hover:bg-transparent transition-colors" />
-              </div>
-
-              <div className="group relative aspect-square overflow-hidden rounded-[1.25rem] border-2 border-blue-900 bg-blue-100">
-                <img 
-                  src="https://anker.ph/cdn/shop/files/B2697J41_800x.png" 
-                  alt="Study Supplies" 
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-blue-900/10 group-hover:bg-transparent transition-colors" />
-              </div>
-
-              <div className="group relative aspect-square overflow-hidden rounded-[1.25rem] border-2 border-blue-900 bg-blue-100">
-                <img 
-                  src="https://varsitylifestyleco.com/cdn/shop/files/NULanyard.jpg" 
-                  alt="Campus Apparel" 
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-blue-900/10 group-hover:bg-transparent transition-colors" />
-              </div>
-
-              <div className="group relative aspect-square overflow-hidden rounded-[1.25rem] border-2 border-blue-900 bg-blue-100">
-                <img 
-                  src="https://hydroflask.ph/cdn/shop/files/2100313069_1_1024x1024.jpg?v=1761293661" 
-                  alt="School Merch" 
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-blue-900/10 group-hover:bg-transparent transition-colors" />
-              </div>
-
-            </div>
-            <Button to="/products" className="mt-5 w-full" variant="primary">View Products</Button>
+        <div className="rounded-2xl border border-white/10 bg-[#112240] p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#F4B41A]">Shop by category</p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            {categories.map((category) => (
+              <Link
+                key={category.name}
+                to={`/products?category=${encodeURIComponent(category.name)}`}
+                className="group relative aspect-square overflow-hidden rounded-2xl border-2 border-blue-900 bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#F4B41A]"
+              >
+                {category.imageUrl
+                  ? <img src={category.imageUrl} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  : <div className="flex h-full items-center justify-center bg-[#0A192F]"><ShoppingBag size={40} className="text-white/20" aria-hidden="true" /></div>}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0A192F] via-[#0A192F]/80 to-transparent p-4 pt-10">
+                  <p className="font-bold text-white">{category.name}</p>
+                  <p className="text-xs text-blue-200/80">{category.count} product{category.count === 1 ? '' : 's'}</p>
+                </div>
+              </Link>
+            ))}
+            {loaded && categories.length === 0 && (
+              <p className="text-sm text-blue-200/80">No products yet.</p>
+            )}
           </div>
+          <Link to="/products"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#F4B41A] py-3 text-xs font-bold uppercase tracking-[0.16em] text-[#07111F] transition hover:bg-[#FFD166]">
+            View all products <ArrowRight size={14} aria-hidden="true" />
+          </Link>
         </div>
       </section>
     </div>

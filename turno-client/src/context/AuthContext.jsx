@@ -1,30 +1,28 @@
 import { createContext, useContext, useState } from 'react';
 import * as authApi from '../api/auth.js';
+import * as session from '../api/session.js';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
-  });
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [user, setUser] = useState(() => session.getStoredUser());
+  const [token, setToken] = useState(() => session.getToken());
   const [loading, setLoading] = useState(false);
 
-  const isAdmin = user?.role === 'admin';
-  const isCustomer = user?.role === 'customer';
+  const isAdmin = user?.role === 'Admin';
+  const isCustomer = user?.role === 'Customer';
 
-  function saveSession(data) {
+  function saveSession(data, remember = true) {
     setToken(data.token);
     setUser(data.user);
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
+    session.saveSession(data, remember);
   }
 
-  async function login(email, password) {
+  async function login(email, password, remember = true) {
     setLoading(true);
     try {
       const res = await authApi.login({ email, password });
-      saveSession(res.data);
+      saveSession(res.data, remember);
       return { success: true, role: res.data.user.role };
     } catch (err) {
       return { success: false, message: err.response?.data?.message || 'Login failed.' };
@@ -45,15 +43,17 @@ export function AuthProvider({ children }) {
   function logout() {
     setUser(null);
     setToken(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    session.clearSession();
+    // The cart belongs to the person who was signed in
+    localStorage.removeItem('cart');
   }
 
   async function refreshUser() {
     try {
       const res = await authApi.getMe();
-      setUser(res.data);
-      localStorage.setItem('user', JSON.stringify(res.data));
+      const currentUser = res.data.data;
+      setUser(currentUser);
+      session.saveUser(currentUser);
     } catch { logout(); }
   }
 

@@ -23,9 +23,9 @@ const SignInPage = () => {
     e.preventDefault();
     setError('');
     if (!form.email || !form.password) return setError('Please fill in all fields.');
-    const result = await login(form.email, form.password);
+    const result = await login(form.email.trim(), form.password, rememberMe);
     if (result.success) {
-      navigate(result.role === 'admin' ? '/admin/products' : from, { replace: true });
+      navigate(result.role === 'Admin' ? '/admin/products' : from, { replace: true });
     } else {
       setError(result.message);
     }
@@ -35,9 +35,9 @@ const SignInPage = () => {
     <>
       {/* Heading */}
       <div className="mb-7">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-[#F4B41A]/70 mb-2">Welcome back</p>
-        <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">Log In</h1>
-        <p className="mt-1.5 text-sm leading-relaxed text-blue-200/50">
+        <p className="text-xs font-bold uppercase tracking-widest text-[#F4B41A] mb-2">Welcome back</p>
+        <h1 className="text-2xl font-black text-white sm:text-3xl">Log In</h1>
+        <p className="mt-1.5 text-sm leading-relaxed text-blue-200/80">
           Access your orders, cart, and profile.
         </p>
       </div>
@@ -45,49 +45,49 @@ const SignInPage = () => {
       {/* Error */}
       {error && (
         <div className="mb-5 flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-400">
-          <span>⚠️</span> {error}
+          {error}
         </div>
       )}
 
       <form className="space-y-4" onSubmit={handleSubmit}>
-        {/* ID or email */}
+        {/* Email */}
         <div>
-          <label htmlFor="signin-email" className="text-[10px] font-bold uppercase tracking-widest text-blue-300/50 block mb-1.5">
-            Student/Employee ID or Email
+          <label htmlFor="signin-email" className="text-xs font-bold uppercase tracking-widest text-blue-300/80 block mb-1.5">
+            Email Address
           </label>
           <div className="relative">
-            <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-300/30" />
+            <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-300/80" />
             <input
-              id="signin-email" name="email" type="text"
-              placeholder="ID number or NU email" autoComplete="username"
+              id="signin-email" name="email" type="email"
+              placeholder="student@email.com" autoComplete="email"
               required value={form.email} onChange={handleChange}
-              className="w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 py-3 text-sm text-white outline-none transition placeholder:text-white/20 focus:border-[#F4B41A]/50 focus:bg-white/8 focus:ring-1 focus:ring-[#F4B41A]/30"
+              className="w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 py-3 text-sm text-white outline-none transition placeholder:text-white/40 focus:border-[#F4B41A]/50 focus:bg-white/8 focus:ring-1 focus:ring-[#F4B41A]/30"
             />
           </div>
         </div>
 
         {/* Password */}
         <div>
-          <label htmlFor="signin-password" className="text-[10px] font-bold uppercase tracking-widest text-blue-300/50 block mb-1.5">
+          <label htmlFor="signin-password" className="text-xs font-bold uppercase tracking-widest text-blue-300/80 block mb-1.5">
             Password
           </label>
           <div className="relative">
-            <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-300/30" />
+            <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-300/80" />
             <input
               id="signin-password" name="password" type={showPw ? 'text' : 'password'}
               placeholder="Your password" autoComplete="current-password"
               required value={form.password} onChange={handleChange}
-              className="w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-11 py-3 text-sm text-white outline-none transition placeholder:text-white/20 focus:border-[#F4B41A]/50 focus:bg-white/8 focus:ring-1 focus:ring-[#F4B41A]/30"
+              className="w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-11 py-3 text-sm text-white outline-none transition placeholder:text-white/40 focus:border-[#F4B41A]/50 focus:bg-white/8 focus:ring-1 focus:ring-[#F4B41A]/30"
             />
-            <button type="button" onClick={() => setShowPw((v) => !v)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-blue-300/30 hover:text-white/60 transition">
+            <button type="button" onClick={() => setShowPw((v) => !v)} aria-label={showPw ? 'Hide password' : 'Show password'}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-blue-300/80 hover:text-white/60 transition">
               {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
             </button>
           </div>
         </div>
 
         <div className="flex items-center justify-between gap-4 pt-1 text-xs">
-          <label htmlFor="remember-me" className="flex cursor-pointer items-center gap-2 text-blue-200/60">
+          <label htmlFor="remember-me" className="flex cursor-pointer items-center gap-2 text-blue-200/80">
             <input
               id="remember-me"
               type="checkbox"
@@ -109,7 +109,7 @@ const SignInPage = () => {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 w-full flex items-center justify-center gap-2 rounded-xl bg-[#F2A900] py-3.5 text-[11px] font-black uppercase tracking-[0.2em] text-[#00205B] shadow-lg shadow-[#F2A900]/20 transition-all hover:bg-[#FFC72C] hover:shadow-xl hover:shadow-[#F2A900]/30 active:scale-95 disabled:opacity-60"
+          className="mt-2 w-full flex items-center justify-center gap-2 rounded-xl bg-[#F2A900] py-3.5 text-xs font-black uppercase tracking-[0.2em] text-[#00205B] shadow-lg shadow-[#F2A900]/20 transition-all hover:bg-[#FFC72C] hover:shadow-xl hover:shadow-[#F2A900]/30 active:scale-95 disabled:opacity-60"
         >
           {loading
             ? <><span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[#0A192F] border-r-transparent" /> Logging in…</>
@@ -118,7 +118,7 @@ const SignInPage = () => {
         </button>
       </form>
 
-      <div className="mt-6 border-t border-white/5 pt-5 text-center text-sm text-blue-300/50">
+      <div className="mt-6 border-t border-white/5 pt-5 text-center text-sm text-blue-300/80">
         Don&apos;t have an account?{' '}
         <Link to="/auth/signup" className="font-bold text-[#F2A900] transition hover:text-[#FFC72C]">
           Register here

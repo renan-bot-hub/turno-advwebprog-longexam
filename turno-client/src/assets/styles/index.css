@@ -1,26 +1,90 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* One typeface for the whole site: Outfit (loaded in index.html, weights 400–900) */
+@theme {
+  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --ink: #07111f;
+  --ink-soft: #0c1d31;
+  --surface: #102943;
+  --surface-raised: #153554;
+  --line: rgba(191, 220, 238, 0.14);
+  --muted: #8ba6bb;
+  --gold: #f4b41a;
+  --gold-bright: #ffd166;
+  --mint: #6ee7b7;
+}
 
 @layer base {
-  body {   
-    @apply antialiased;
-    font-family: 'Inter', 'Outfit', sans-serif;
-    background-color: #0A192F;
-    color: #fff;
+  html {
+    background: var(--ink);
+    color-scheme: dark;
   }
 
-  #root {
-    @apply min-h-screen;
+  body {
+    @apply antialiased;
+    font-family: var(--font-sans);
+    background:
+      radial-gradient(circle at 10% 0%, rgba(244, 180, 26, 0.08), transparent 28rem),
+      linear-gradient(145deg, var(--ink), #09192b 55%, #0c2035);
+    color: #f6f8fb;
+    min-width: 320px;
+  }
+
+  #root { @apply min-h-screen; }
+  /* Headings use the same font, just tighter, so large text doesn't look loose */
+  h1, h2, h3, h4, h5, h6 { font-family: var(--font-sans); letter-spacing: -0.01em; }
+  button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 3px;
+  }
+
+  ::selection { background: var(--gold); color: var(--ink); }
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--ink); }
+  ::-webkit-scrollbar-thumb { background: #24445e; border: 3px solid var(--ink); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+  input::placeholder, textarea::placeholder { color: rgba(191, 220, 238, 0.42); }
+
+  .app-header {
+    background: rgba(7, 17, 31, 0.86);
+    border-color: var(--line);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .app-shell { background: transparent; }
+  .page-enter { animation: pageEnter 0.45s ease-out both; }
+
+  .surface-glass {
+    background: rgba(16, 41, 67, 0.72);
+    border: 1px solid var(--line);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.14);
+    backdrop-filter: blur(18px);
+  }
+
+  .eyebrow {
+    color: var(--gold-bright);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
   }
 }
 
 @layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.4s ease-out both;
-  }
+  .animate-fade-in { animation: fadeIn 0.4s ease-out both; }
 
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(4px); }
-    to   { opacity: 1; transform: translateY(0); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pageEnter {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }

@@ -4,9 +4,9 @@
 
   const Layout = () => {
     return (
-      <div className="min-h-screen bg-[#0A192F] text-white">
+      <div className="app-shell min-h-screen text-white">
         <NavBar />
-        <main className="pb-16">
+        <main className="page-enter pb-16">
           <Outlet />
         </main>
         <Footer/>

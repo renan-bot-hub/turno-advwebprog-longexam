@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getProduct } from '../../api/products.js';
+import { getProduct, categoryName, supplierName } from '../../api/products.js';
 import { getReviews, createReview } from '../../api/reviews.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import {
@@ -11,12 +11,26 @@ import {
 // ─── Star Rating ───────────────────────────────────────────────────────────────
 const StarRating = ({ value, onChange, size = 'md' }) => {
   const sz = size === 'sm' ? 14 : 22;
+  const starIcon = (star) => (
+    <Star size={sz} aria-hidden="true" className={star <= value ? 'fill-[#F4B41A] text-[#F4B41A]' : 'text-white/20'} />
+  );
+
+  // Display-only ratings are plain icons; only the review form gets clickable buttons
+  if (!onChange) {
+    return (
+      <div className="flex gap-1" role="img" aria-label={`Rated ${value} out of 5`}>
+        {[1, 2, 3, 4, 5].map((star) => <span key={star}>{starIcon(star)}</span>)}
+      </div>
+    );
+  }
+
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-1" role="radiogroup" aria-label="Your rating">
       {[1, 2, 3, 4, 5].map((star) => (
-        <button key={star} type="button" onClick={() => onChange?.(star)}
-          className={`transition-transform ${onChange ? 'hover:scale-110 cursor-pointer' : 'cursor-default'}`}>
-          <Star size={sz} className={star <= value ? 'fill-[#F4B41A] text-[#F4B41A]' : 'text-white/20'} />
+        <button key={star} type="button" onClick={() => onChange(star)}
+          role="radio" aria-checked={star === value} aria-label={`${star} star${star === 1 ? '' : 's'}`}
+          className="cursor-pointer transition-transform hover:scale-110">
+          {starIcon(star)}
         </button>
       ))}
     </div>
@@ -26,7 +40,7 @@ const StarRating = ({ value, onChange, size = 'md' }) => {
 const ProductPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isCustomer } = useAuth();
+  const { user, isCustomer, isAdmin } = useAuth();
 
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -48,7 +62,7 @@ const ProductPage = () => {
     setLoading(true);
     Promise.all([getProduct(id), getReviews({ productId: id })])
       .then(([prodRes, revRes]) => {
-        setProduct(prodRes.data.data);
+        setProduct(prodRes.data.data || prodRes.data);
         setReviews(revRes.data.data || []);
       })
       .catch(() => setError('Product not found.'))
@@ -62,11 +76,13 @@ const ProductPage = () => {
     if (existing) {
       existing.quantity = Math.min(existing.quantity + qty, product.stock);
     } else {
-      cart.push({ ...product, quantity: qty });
+      // Price is only for display; the server uses the current database price at checkout
+      const { _id, title, price, stock, imageUrl } = product;
+      cart.push({ _id, title, category: categoryName(product), price, stock, imageUrl, quantity: qty });
     }
     localStorage.setItem('cart', JSON.stringify(cart));
     setCartMsg('Added to cart!');
-    setTimeout(() => setCartMsg(''), 3000);
+    setTimeout(() => setCartMsg(''), 6000);
   }
 
   async function handleReviewSubmit(e) {
@@ -90,7 +106,7 @@ const ProductPage = () => {
       <div className="min-h-screen bg-[#0A192F] flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-[#F4B41A] border-r-transparent" />
-          <p className="mt-4 text-sm text-blue-300/50">Loading product…</p>
+          <p className="mt-4 text-sm text-blue-300/80">Loading product…</p>
         </div>
       </div>
     );
@@ -121,11 +137,11 @@ const ProductPage = () => {
     : { label: `${product.stock} in stock`, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
 
   return (
-    <div className="min-h-screen bg-[#0A192F] font-['Outfit']">
+    <div className="min-h-screen bg-[#0A192F]">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
 
         {/* Breadcrumb */}
-        <nav className="mb-8 flex items-center gap-2 text-xs text-blue-300/40">
+        <nav className="mb-8 flex items-center gap-2 text-xs text-blue-300/80">
           <Link to="/" className="hover:text-white transition">Home</Link>
           <span>/</span>
           <Link to="/products" className="hover:text-white transition">Products</Link>
@@ -149,7 +165,7 @@ const ProductPage = () => {
               )}
               {/* Stock badge overlay */}
               <div className="absolute top-4 left-4">
-                <span className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm ${stockStatus.color}`}>
+                <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider backdrop-blur-sm ${stockStatus.color}`}>
                   {stockStatus.label}
                 </span>
               </div>
@@ -159,9 +175,12 @@ const ProductPage = () => {
           {/* ── Product Details ── */}
           <div className="flex flex-col gap-5">
             {/* Category */}
-            <span className="text-[11px] font-bold uppercase tracking-widest text-[#F4B41A]/70">
-              {product.category}
-            </span>
+            <p className="text-xs font-bold uppercase tracking-widest text-[#F4B41A]">
+              {categoryName(product)}
+              {supplierName(product) && (
+                <span className="ml-2 font-medium normal-case tracking-normal text-blue-300/80">· Supplied by {supplierName(product)}</span>
+              )}
+            </p>
 
             {/* Title */}
             <h1 className="text-3xl font-black leading-tight text-white sm:text-4xl">
@@ -173,7 +192,7 @@ const ProductPage = () => {
               <div className="flex items-center gap-3">
                 <StarRating value={Math.round(avgRating)} size="sm" />
                 <span className="text-sm font-bold text-white/70">{avgRating.toFixed(1)}</span>
-                <span className="text-sm text-blue-300/40">({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
+                <span className="text-sm text-blue-300/80">({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
               </div>
             )}
 
@@ -186,7 +205,7 @@ const ProductPage = () => {
 
             {/* Description */}
             {product.description && (
-              <p className="text-sm leading-relaxed text-blue-200/60 border-t border-white/5 pt-4">
+              <p className="text-sm leading-relaxed text-blue-200/80 border-t border-white/5 pt-4">
                 {Array.isArray(product.description) ? product.description.join(' ') : product.description}
               </p>
             )}
@@ -195,19 +214,24 @@ const ProductPage = () => {
             <div className="border-t border-white/5" />
 
             {/* Quantity + Add to Cart */}
-            {product.stock > 0 ? (
+            {isAdmin ? (
+              <div className="rounded-xl border border-white/10 bg-[#112240] px-4 py-3 text-sm text-blue-200/80">
+                You are signed in as an admin. To change this product, go to{' '}
+                <Link to="/admin/products" className="font-bold text-[#F4B41A] hover:underline">Admin → Products</Link>.
+              </div>
+            ) : product.stock > 0 ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <label className="text-xs font-bold uppercase tracking-widest text-blue-300/50">Qty</label>
-                  <div className="flex items-center rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-                    <button onClick={() => setQty(Math.max(1, qty - 1))}
-                      className="flex h-10 w-10 items-center justify-center text-white/70 hover:bg-white/10 hover:text-white transition">
-                      <Minus size={14} />
+                  <span id="qty-label" className="text-xs font-bold uppercase tracking-widest text-blue-300/80">Qty</span>
+                  <div className="flex items-center rounded-xl border border-white/10 bg-white/5 overflow-hidden" role="group" aria-labelledby="qty-label">
+                    <button onClick={() => setQty(Math.max(1, qty - 1))} aria-label="Decrease quantity" disabled={qty <= 1}
+                      className="flex h-10 w-10 items-center justify-center text-white/70 hover:bg-white/10 hover:text-white transition disabled:opacity-40">
+                      <Minus size={14} aria-hidden="true" />
                     </button>
-                    <span className="w-12 text-center text-sm font-bold text-white">{qty}</span>
-                    <button onClick={() => setQty(Math.min(product.stock, qty + 1))}
-                      className="flex h-10 w-10 items-center justify-center text-white/70 hover:bg-white/10 hover:text-white transition">
-                      <Plus size={14} />
+                    <span className="w-12 text-center text-sm font-bold text-white" aria-live="polite">{qty}</span>
+                    <button onClick={() => setQty(Math.min(product.stock, qty + 1))} aria-label="Increase quantity" disabled={qty >= product.stock}
+                      className="flex h-10 w-10 items-center justify-center text-white/70 hover:bg-white/10 hover:text-white transition disabled:opacity-40">
+                      <Plus size={14} aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -219,8 +243,11 @@ const ProductPage = () => {
                 </button>
 
                 {cartMsg && (
-                  <div className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-400">
-                    <CheckCircle2 size={16} /> {cartMsg}
+                  <div role="status" className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-400">
+                    <CheckCircle2 size={16} aria-hidden="true" /> {cartMsg}
+                    <Link to="/cart" className="ml-auto inline-flex items-center gap-1 font-bold text-emerald-300 hover:text-white">
+                      View Cart <ArrowLeft size={14} className="rotate-180" aria-hidden="true" />
+                    </Link>
                   </div>
                 )}
               </div>
@@ -235,11 +262,11 @@ const ProductPage = () => {
             <div className="grid grid-cols-2 gap-3 pt-2">
               {[
                 { icon: Shield, text: 'Official NU Product' },
-                { icon: Package, text: 'Campus Delivery' },
+                { icon: Package, text: 'Campus Pickup' },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-2 rounded-xl border border-white/5 bg-[#112240] px-3 py-2.5">
                   <Icon size={13} className="text-[#F4B41A]" />
-                  <span className="text-[11px] font-medium text-blue-300/60">{text}</span>
+                  <span className="text-xs font-medium text-blue-300/80">{text}</span>
                 </div>
               ))}
             </div>
@@ -254,17 +281,17 @@ const ProductPage = () => {
               {avgRating && (
                 <div className="mt-1 flex items-center gap-2">
                   <StarRating value={Math.round(avgRating)} size="sm" />
-                  <span className="text-sm text-blue-300/50">{avgRating.toFixed(1)} out of 5</span>
+                  <span className="text-sm text-blue-300/80">{avgRating.toFixed(1)} out of 5</span>
                 </div>
               )}
             </div>
-            <span className="text-sm text-blue-300/40">{reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
+            <span className="text-sm text-blue-300/80">{reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
           </div>
 
           {reviews.length === 0 ? (
             <div className="py-8 text-center border border-white/5 rounded-xl">
               <Star size={32} className="mx-auto text-white/10 mb-3" />
-              <p className="text-sm text-blue-300/40">No reviews yet. Be the first to share your experience!</p>
+              <p className="text-sm text-blue-300/80">No reviews yet. Be the first to share your experience!</p>
             </div>
           ) : (
             <div className="space-y-4 mb-8">
@@ -272,7 +299,7 @@ const ProductPage = () => {
                 <div key={r._id} className="rounded-xl border border-white/5 bg-[#0A192F]/60 p-5">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F4B41A]/10 text-[10px] font-black text-[#F4B41A]">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F4B41A]/10 text-xs font-black text-[#F4B41A]">
                         {r.user?.firstName?.[0]}{r.user?.lastName?.[0]}
                       </div>
                       <div>
@@ -281,7 +308,7 @@ const ProductPage = () => {
                       </div>
                     </div>
                   </div>
-                  {r.comment && <p className="text-sm text-blue-200/60 leading-relaxed pl-11">{r.comment}</p>}
+                  {r.comment && <p className="text-sm text-blue-200/80 leading-relaxed pl-11">{r.comment}</p>}
                 </div>
               ))}
             </div>
@@ -302,24 +329,24 @@ const ProductPage = () => {
                 </div>
               )}
               <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-blue-300/50 block mb-2">Your Rating</label>
+                <span className="text-xs font-bold uppercase tracking-widest text-blue-300/80 block mb-2">Your Rating</span>
                 <StarRating value={reviewForm.rating} onChange={(v) => setReviewForm((f) => ({ ...f, rating: v }))} />
               </div>
               <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-blue-300/50 block mb-2">Comment</label>
-                <textarea rows={4} value={reviewForm.comment}
+                <label htmlFor="review-comment" className="text-xs font-bold uppercase tracking-widest text-blue-300/80 block mb-2">Comment</label>
+                <textarea id="review-comment" rows={4} value={reviewForm.comment}
                   onChange={(e) => setReviewForm((f) => ({ ...f, comment: e.target.value }))}
                   placeholder="Share your experience with this product…"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-[#F4B41A]/40 resize-none transition" />
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none focus:border-[#F4B41A]/40 resize-none transition" />
               </div>
               <button type="submit" disabled={submitting}
-                className="rounded-xl bg-[#F4B41A] px-8 py-3 text-[11px] font-black uppercase tracking-wider text-[#0A192F] shadow-lg shadow-[#F4B41A]/20 transition-all hover:bg-[#FFC72C] hover:shadow-xl active:scale-95 disabled:opacity-50">
+                className="rounded-xl bg-[#F4B41A] px-8 py-3 text-xs font-black uppercase tracking-wider text-[#0A192F] shadow-lg shadow-[#F4B41A]/20 transition-all hover:bg-[#FFC72C] hover:shadow-xl active:scale-95 disabled:opacity-50">
                 {submitting ? 'Submitting…' : 'Submit Review'}
               </button>
             </form>
           ) : !user ? (
             <div className="border-t border-white/5 pt-6 text-center">
-              <p className="text-sm text-blue-300/40 mb-3">Sign in to write a review</p>
+              <p className="text-sm text-blue-300/80 mb-3">Sign in to write a review</p>
               <Link to="/auth/signin"
                 className="inline-flex items-center gap-2 rounded-xl bg-[#F4B41A] px-6 py-2.5 text-sm font-bold text-[#0A192F] hover:bg-[#FFC72C] transition">
                 Log In to Review
