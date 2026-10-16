@@ -2,6 +2,7 @@ services:
   - type: web
     name: turno-api
     runtime: node
+    plan: free
     rootDir: turno-server
     buildCommand: npm ci
     startCommand: npm start
