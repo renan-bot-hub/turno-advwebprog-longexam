@@ -98,6 +98,20 @@ Run linting:
 npm run lint
 ```
 
+## Deploy
+
+Deploy the React client to Vercel and the Express API to Render. The API is a long-running Express server, so it should not be deployed as a static Vercel site. The root `render.yaml` defines the API service; `turno-client/vercel.json` provides the client-side route fallback for React Router.
+
+1. Push this repository to GitHub.
+2. Create a MongoDB Atlas database and database user. Configure Atlas Network Access to allow connections from the API host; use Render's outbound IP ranges where practical instead of leaving access open.
+3. In Render, create a Blueprint from this repository using `render.yaml`. Supply `MONGODB_URI`, `CLIENT_URL`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` when prompted. Use the exact Vercel site origin for `CLIENT_URL` (no trailing slash). Render generates `JWT_SECRET`.
+4. In the Render service shell, run `npm run seed` from the service root once. This creates the sample records and the admin account without deleting existing products. Keep the admin password private and change it after first login.
+5. In Vercel, import this repository and set the project root directory to `turno-client`. Use `npm run build` and `dist` if Vercel does not detect the Vite defaults.
+6. Add the Vercel environment variable `VITE_API_URL` with the deployed API URL ending in `/api`, for example `https://turno-api.onrender.com/api`, then deploy or redeploy the client.
+7. Verify the API at `https://<api-host>/api/health`, then open the Vercel site and test a nested route, login, and one API-backed page.
+
+The Blueprint intentionally does not set Cloudinary credentials. Add `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` in Render if product image uploads are needed. Never commit production `.env` files or secrets.
+
 ## Push to GitHub Using Git Bash
 
 Open **Git Bash** or **VS Code Terminal**, then go to the project root folder:
